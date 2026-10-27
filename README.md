@@ -1,16 +1,22 @@
 # dsh-startup-screen
 
-DeepSeek Harness 的启动界面与启动动画插件（泰坦陨落 2 · BT-7274 版）。
+DeepSeek Harness 的启动界面与启动动画插件（泰坦陨落 2 · Hammond Robotics / HARNESS 版）。
 
-黑幕军徽 → 过曝洗白 → 军用「技术档案」底板 → 五步交互式铁驭链接 → 协议三揭幕。
+黑幕军徽 → 过曝洗白 → 军工底板（背景图 + 左栏信息列）→ 五步交互式铁驭链接 → 协议三揭幕。
 
 ---
 
 ## 功能
 
 **开机序列**　冷启动时播一段完整的开机动画，六幕连贯：军徽番号 → 过曝洗白 →
-暗色军用底板 → 五步铁驭链接 → 协议三揭幕。中央一圈环形准星缓慢自转，缺口留在
-正下方，不会挡住底部文字。
+军工底板 → 五步铁驭链接 → 协议三揭幕。2.2 起底板照 Hammond Robotics 概念图
+重制：左栏信息列（TITANFALL|2 徽标 → Hammond 圆徽 → **/ HARNESS** 主标题 →
+状态行 → **开机自检清单** → **百分比进度条** → 标语），右上角机构行，整屏
+背景图压阵。
+
+**背景图**　深色主题加载 `lib/assets/bg.jpg`（出厂自带一张铁驭与泰坦眺望
+星球的图，可以换成任意自己的图，支持 png/webp），上面叠左栏衬底与 CRT
+扫描线；**缺图或关掉「背景图」开关时自动回落纯色军工底板**，版式不变。
 
 **可交互，不是播片**　第一、二步要你点按钮或按 Enter 才会继续（可以关掉）。
 右上角有跳过按钮，Esc 也能跳。
@@ -22,8 +28,9 @@ DeepSeek Harness 的启动界面与启动动画插件（泰坦陨落 2 · BT-727
 DBM-VPBT7274 语音包），其余槽位与缺素材时自动回落系统 TTS 合成男声，不影响
 启动。浏览器要求先有一次点击才准出声，所以点过按钮之后才会听到声音。
 
-**自检流水**　第四幕右上角逐项打出 REACTOR / SENSORS / WEAPONS SYSTEMS …
-ONLINE，六项自检逐一点亮才继续。
+**自检流水**　左栏自检清单随六幕推进逐项打出 OK——LOADING PILOT PROFILE /
+INITIALIZING TITAN INTERFACE / SYNCING NEURAL LINK / ESTABLISHING COMMS /
+FINALIZING BOOT SEQUENCE，进度条与百分比同步走到 100%。
 
 **语音没播完不会推进**　每一步停留多久由实际播报时长决定。你点得快也不会把
 语音掐断。
@@ -49,7 +56,7 @@ ONLINE，六项自检逐一点亮才继续。
 ## 安装
 
 ```bash
-dsh plugin --profile web add ./dsh-startup-screen-2.1.0.tgz
+dsh plugin --profile web add ./dsh-startup-screen-2.2.0.tgz
 ```
 
 Windows 上也可以解压 release 压缩包后**双击「安装.cmd」**，脚本会自动完成同样的操作。
@@ -83,7 +90,8 @@ dsh plugin --profile web remove dsh-startup-screen
 |---|---|---|
 | 启用 | 开 | 总开关，关掉就完全不播 |
 | 显示模式 | 每次会话 | `每次会话` 一个浏览器会话播一次 / `总是` 每次刷新都播 / `每天` 一天一次 |
-| 主题 | 深色 | `深色` 军用 HUD 底板（默认）/ `浅色` 暖白档案底板 |
+| 主题 | 深色 | `深色` 军工 HUD + 背景图（默认）/ `浅色` 暖白档案底板 |
+| 背景图 | 开 | 深色主题加载 `lib/assets/bg.jpg|png|webp`，缺图回落纯色底板 |
 | 速度 | 1× | 整段动画的快慢，0.35 – 3 倍 |
 | 要求确认 | 开 | 第 1、2 步是否等你点按钮才继续 |
 | 允许跳过 | 开 | 是否显示右上角跳过按钮、是否响应 Esc |
@@ -122,17 +130,21 @@ dsh plugin --profile web remove dsh-startup-screen
 
 | 选项 | 默认 | 作用 |
 |---|---|---|
-| 强调色 | `#ff9a1f` | 阶段条、进度条、准星的军用琥珀 |
+| 强调色 | `#4d9fe8` | 军工钢蓝：清单 OK、进度条、状态行字幕、圆徽描边 |
 | 故障色 A / B | `#ff3b30` / `#2971b8` | 揭幕那下色散故障的红与蓝 |
 
 ### 文案
 
 | 选项 | 默认 | 作用 |
 |---|---|---|
-| 品牌三行 | `MILITIA` / `FREE FRONTIER` / `SRS MK.7` | 左上角番号块 |
+| 左上 · 主字 / 编号 | `TITANFALL` / `2` | 左上角徽标「TITANFALL \| 2」 |
+| 圆徽 · 字母/名称/副名 | `H` / `Hammond` / `ROBOTICS` | 徽标下方的圆徽块 |
+| 主标题 / 副行 | `HARNESS` / `IMC / HAMMOND PILOT ASSIST SYSTEM` | 左栏大标题两行 |
+| 右上 · 机构行 / 系统行 | `IMC / HAMMOND ROBOTICS` / `ADVANCED PILOT SYSTEMS` | 右上角两行小字 |
+| 标语 | `BETTER HUMANS. STRONGER TOGETHER.` | 进度条下方的一行小字 |
 | 黑幕三行 | `自由边境` / `MILITIA` / `VANGUARD CLASS · TITAN OS` | 开场黑幕上的字 |
 | 终幕方框 | `BT-7274` | 揭幕后中央的黑底白字框 |
-| 页脚 | `POWERED BY TITAN OS` | 右下角页脚 |
+| 页脚 | `PROPERTY OF HAMMOND ROBOTICS` | 左下角页脚（上方自动带 `HARNESS v版本号`） |
 
 ---
 

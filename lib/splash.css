@@ -1,15 +1,18 @@
 /* ============================================================================
  * dsh-startup-screen — 启动界面 / 启动动画样式
  * ----------------------------------------------------------------------------
- * 2.0 起照《泰坦陨落 2》（Titanfall 2）BT-7274 的开机语汇重排：
- * 黑色序幕 → 过曝洗白 → 军用"技术档案"底板（默认暗色 + 扫描线）→
- * 等宽字距状态行 → 环形准星扫描 → PROTOCOL 3 版式 → 色散故障。
+ * 2.0 起照《泰坦陨落 2》（Titanfall 2）BT-7274 的开机语汇重排；
+ * 2.2 起版式照 Hammond Robotics / HARNESS 概念图重制：
+ *   黑色序幕 → 过曝洗白 → 军工底板（背景图 + 左栏信息列 + CRT 扫描线）→
+ *   左栏信息列：TITANFALL|2 徽标 → Hammond 圆徽 → / HARNESS 主标题 →
+ *   状态行（中文主字 + 英文等宽字幕）→ 开机自检清单 → 进度条 + 百分比 → 标语；
+ *   右上角机构行，PROTOCOL 3 终幕版式 + 色散故障。
  *
  * 全部字体都取系统自带字体，零网络依赖：
  *   --dsu-din   Bahnschrift（Windows 10+ 自带 DIN 1451 风格 —— 正是泰坦陨落
  *               HUD 那种窄体技术字）
- *   --dsu-mono  Cascadia Mono / Consolas（等宽字距小字 / 自检流水）
- *   --dsu-zh    微软雅黑（底部中文小字幕）
+ *   --dsu-mono  Cascadia Mono / Consolas（等宽字距小字 / 自检清单）
+ *   --dsu-zh    微软雅黑（中文主字 / 小字幕）
  * ========================================================================== */
 
 #dsh-startup-root,
@@ -30,7 +33,7 @@
   --dsu-muted: #7a7873;
   --dsu-hair: rgba(10, 10, 10, 0.16);
   --dsu-hair-soft: rgba(10, 10, 10, 0.07);
-  --dsu-accent: #ff7500;
+  --dsu-accent: #4d9fe8;
   --dsu-glitch-a: #ff3b30;
   --dsu-glitch-b: #2971b8;
   --dsu-box-bg: #0a0a0a;
@@ -85,20 +88,36 @@
 .dsu-logo svg,
 .dsu-w3 svg { fill: currentColor; }
 
-/* 深色主题：同一套版式，换成暗底板 */
+/* 深色主题：同一套版式，换成暗底板（Hammond 军工蓝黑） */
 #dsh-startup-root.dsu-dark {
-  --dsu-bg: #0b0b0c;
-  --dsu-bg-2: #131315;
-  --dsu-ink: #f2f1ee;
-  --dsu-ink-soft: #cfcecb;
-  --dsu-muted: #85847f;
+  --dsu-bg: #0a1220;
+  --dsu-bg-2: #050a11;
+  --dsu-ink: #f2f4f6;
+  --dsu-ink-soft: #c6ccd4;
+  --dsu-muted: #8b939e;
   --dsu-hair: rgba(255, 255, 255, 0.18);
   --dsu-hair-soft: rgba(255, 255, 255, 0.07);
   --dsu-box-bg: #f2f1ee;
   --dsu-box-ink: #0b0b0c;
-  --dsu-sub-glow: 0 0 6px rgba(0, 0, 0, 0.9);
+  --dsu-sub-glow: 0 1px 10px rgba(0, 0, 0, 0.85);
   background: #000;
 }
+
+/* ── 背景图层（lib/assets/bg.jpg|png|webp，缺图回落纯色底板）───────────── */
+.dsu-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 1000ms ease;
+  pointer-events: none;
+}
+.dsu-bg.dsu-in { opacity: 1; }
+/* 浅色主题不用背景图，保持暖白档案底板 */
+#dsh-startup-root:not(.dsu-dark) .dsu-bg { display: none; }
 
 /* 首屏兜底：脚本还没跑起来时也要先糊住整个窗口，避免闪出应用本体 */
 #dsh-startup-root.dsu-boot::after {
@@ -119,25 +138,44 @@
 .dsu-plate {
   position: absolute;
   inset: 0;
+  z-index: 2;
   background:
     radial-gradient(120% 90% at 78% 12%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 55%),
     linear-gradient(168deg, var(--dsu-bg-2) 0%, var(--dsu-bg) 42%, var(--dsu-bg) 100%);
   opacity: 0;
 }
 
+/* 深色主题：背景图之上叠左栏信息列衬底 + 上下压暗，保证白字可读 */
 .dsu-dark .dsu-plate {
   background:
-    radial-gradient(120% 90% at 78% 12%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 55%),
-    linear-gradient(168deg, var(--dsu-bg-2) 0%, var(--dsu-bg) 42%, var(--dsu-bg) 100%);
+    linear-gradient(90deg,
+      rgba(4, 9, 17, 0.9) 0%,
+      rgba(4, 9, 17, 0.78) 26%,
+      rgba(5, 11, 20, 0.4) 44%,
+      rgba(5, 11, 20, 0.04) 62%,
+      rgba(4, 9, 16, 0.18) 100%),
+    linear-gradient(180deg,
+      rgba(3, 7, 14, 0.5) 0%,
+      rgba(3, 7, 14, 0) 20%,
+      rgba(3, 7, 14, 0) 74%,
+      rgba(2, 5, 10, 0.55) 100%);
 }
 
-/* 背景里若隐若现的档案面板（参考片右侧极淡的方块群） */
+/* 没有背景图时：纯色军工底板兜底（同一版式，不空） */
+.dsu-dark:not(.dsu-has-bg) .dsu-plate {
+  background:
+    radial-gradient(120% 90% at 78% 12%, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(168deg, #0d1626 0%, #070d18 46%, #050a11 100%);
+}
+
+/* 背景里若隐若现的档案面板（浅色主题保留；深色主题压在背景图上太吵，藏掉） */
 .dsu-watermark {
   position: absolute;
   inset: 0;
   opacity: 0;
   pointer-events: none;
 }
+.dsu-dark .dsu-watermark { display: none; }
 .dsu-wm {
   position: absolute;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0));
@@ -297,66 +335,155 @@
   pointer-events: none;
 }
 
-/* ── 品牌块（左上角）──────────────────────────────────────────────────── */
-/* 黑幕结束后统一"滑到位"：左侧文字从 -22px 滑入，右侧元素从 +18px 滑入，
-   按 60ms 一档错开；不再用裁剪式擦除 */
+/* ── 品牌块（左上角：TITANFALL|2 徽标 + Hammond 圆徽）─────────────────── */
+/* 黑幕结束后统一"滑到位"：左侧文字从 -22px 滑入，按 60ms 一档错开 */
 .dsu-brand {
   position: absolute;
   left: 46px;
-  top: 44px;
+  top: 40px;
   z-index: 20;
   color: var(--dsu-ink);
 }
 .dsu-brand-1,
-.dsu-brand-2,
-.dsu-brand-3 {
+.dsu-brand-2 {
   opacity: 0;
   transform: translateX(-22px);
   transition: opacity 560ms cubic-bezier(0.16, 0.84, 0.24, 1),
     transform 560ms cubic-bezier(0.16, 0.84, 0.24, 1);
 }
 .dsu-brand-1 {
-  font-size: 33px;
-  font-weight: 700;
-  letter-spacing: 0.012em;
-  line-height: 0.98;
-}
-.dsu-brand-2 {
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.012em;
-  margin-top: 3px;
-}
-.dsu-brand-3 {
-  font-size: 30px;
-  font-weight: 400;
-  line-height: 1.06;
-  letter-spacing: 0.012em;
   display: flex;
   align-items: baseline;
-  gap: 9px;
+  gap: 12px;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 0.98;
 }
-.dsu-brand-3 b { font-weight: 700; }
+.dsu-brand-1n {
+  font-style: normal;
+  font-weight: 300;
+  font-size: 26px;
+  letter-spacing: 0.02em;
+  color: var(--dsu-muted);
+  border-left: 2px solid var(--dsu-hair);
+  padding-left: 12px;
+}
+.dsu-brand-2 {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 20px;
+}
+.dsu-roundel {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 2px solid var(--dsu-ink);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 3px transparent, inset 0 0 0 4.5px var(--dsu-hair-soft);
+  font-family: var(--dsu-din);
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-indent: 0;
+}
+.dsu-roundel-text { display: flex; flex-direction: column; gap: 3px; }
+.dsu-roundel-name {
+  font-family: var(--dsu-din);
+  font-weight: 600;
+  font-size: 23px;
+  letter-spacing: 0.03em;
+  line-height: 1;
+}
+.dsu-roundel-sub {
+  font-style: normal;
+  font-family: var(--dsu-mono);
+  font-size: 10px;
+  letter-spacing: 0.46em;
+  color: var(--dsu-muted);
+}
 .dsu-brand.dsu-in .dsu-brand-1 { opacity: 1; transform: none; transition-delay: 60ms; }
 .dsu-brand.dsu-in .dsu-brand-2 { opacity: 1; transform: none; transition-delay: 150ms; }
-.dsu-brand.dsu-in .dsu-brand-3 { opacity: 1; transform: none; transition-delay: 240ms; }
 
-/* 中央状态区 */
-.dsu-center {
+/* ── 右上角机构行（照概念图：两行小字 + 一道斜杠）─────────────────────── */
+.dsu-tr {
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 47%;
-  transform: translateY(-50%);
+  right: 46px;
+  top: 42px;
+  z-index: 20;
+  text-align: right;
+  font-family: var(--dsu-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  line-height: 1.9;
+  color: var(--dsu-ink-soft);
+  opacity: 0;
+  transform: translateX(18px);
+  transition: opacity 560ms ease, transform 560ms cubic-bezier(0.16, 0.84, 0.24, 1);
+}
+.dsu-tr.dsu-in { opacity: 1; transform: none; }
+.dsu-tr-slash {
+  font-style: normal;
+  display: block;
+  margin-top: 2px;
+  font-size: 19px;
+  letter-spacing: 0;
+  color: var(--dsu-muted);
+}
+
+/* ── 左栏信息列（照概念图）：主标题 → 副行 → 状态行 → 清单 → 进度 → 标语 ── */
+.dsu-col {
+  position: absolute;
+  left: 46px;
+  bottom: 118px;
+  width: min(440px, 44vw);
   z-index: 22;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
+  pointer-events: none;
+}
+.dsu-headline {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  font-family: var(--dsu-din);
+  font-size: clamp(34px, 3.6vw, 54px);
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  line-height: 1;
+  color: var(--dsu-ink);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+}
+.dsu-headline i {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--dsu-accent);
+  text-shadow: 0 0 14px rgba(77, 159, 232, 0.35);
+}
+.dsu-headline-sub {
+  margin-top: 10px;
+  font-family: var(--dsu-mono);
+  font-size: 11px;
+  letter-spacing: 0.26em;
+  color: var(--dsu-ink-soft);
+}
+
+/* 状态区（概念图 "INITIATING..." 的位置）*/
+.dsu-center {
+  position: relative;
+  z-index: 22;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 0;
+  margin-top: 30px;
   pointer-events: none;
   transition: opacity 340ms ease;
 }
-/* 终幕时整块中央区（状态行 / 分隔线 / 鲸鱼 / 虚线）必须整体退场，
+/* 终幕时整块状态区（状态行 / 分隔线 / 标识 / 虚线）必须整体退场，
    否则会和 WELCOME 版式叠在一起 */
 .dsu-center.dsu-off { opacity: 0; }
 
@@ -365,7 +492,7 @@
   align-items: center;
   gap: 14px;
   font-family: var(--dsu-din);
-  font-size: 44px;
+  font-size: 30px;
   font-weight: 400;
   letter-spacing: 0.14em;
   color: var(--dsu-ink);
@@ -377,9 +504,10 @@
 .dsu-status.dsu-zhline {
   font-family: var(--dsu-zh);
   font-weight: 400;
-  letter-spacing: 0.22em;
-  text-indent: 0.22em;
-  font-size: 40px;
+  letter-spacing: 0.2em;
+  text-indent: 0.2em;
+  font-size: 29px;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
 }
 .dsu-caret {
   display: inline-block;
@@ -396,40 +524,30 @@
 @keyframes dsu-blink { 50% { opacity: 0; } }
 
 .dsu-sub-en {
-  margin-top: 14px;
+  margin-top: 12px;
   font-family: var(--dsu-mono);
-  font-size: 13px;
+  font-size: 11.5px;
   font-weight: 400;
-  letter-spacing: 0.44em;
-  text-indent: 0.44em;
-  color: var(--dsu-ink-soft);
+  letter-spacing: 0.4em;
+  color: var(--dsu-accent);
   opacity: 0;
   white-space: nowrap;
+  text-shadow: 0 0 12px rgba(77, 159, 232, 0.3);
 }
-.dsu-sub-en.dsu-in { opacity: 1; }
+.dsu-sub-en.dsu-in { opacity: 0.95; }
 
 .dsu-rule {
-  margin-top: 22px;
+  margin-top: 18px;
   height: 1px;
   width: 0;
   background: var(--dsu-hair);
   transition: width 620ms cubic-bezier(0.2, 0.9, 0.2, 1);
 }
-.dsu-rule.dsu-in { width: min(560px, 42vw); }
+.dsu-rule.dsu-in { width: min(330px, 24vw); }
 
-/* 中央标识（鲸鱼）装配区 */
+/* 中央标识（鲸鱼装配）：2.2 版式里不再出现，元素保留供测试与回退 */
 .dsu-logo {
-  margin-top: 26px;
-  height: 0;
-  opacity: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: opacity 420ms ease, height 420ms ease, margin-top 420ms ease;
-}
-.dsu-logo.dsu-in {
-  opacity: 1;
-  height: 118px;
+  display: none;
 }
 .dsu-logo svg {
   width: 84px;
@@ -445,13 +563,7 @@
   color: var(--dsu-ink-soft);
 }
 .dsu-dots {
-  margin-top: 9px;
-  height: 2px;
-  width: 96px;
-  background-image: radial-gradient(circle, var(--dsu-ink) 40%, transparent 42%);
-  background-size: 12px 2px;
-  background-repeat: repeat-x;
-  opacity: 0.5;
+  display: none;
 }
 
 /* 右下角等宽信息行（对应参考片 "· ID CONFIRMED : JOYC"）
@@ -478,9 +590,9 @@
 .dsu-idline.dsu-in { opacity: 1; transform: none; }
 
 /* ── 环形准星（验证通过）───────────────────────────────────────────────── */
-/* 照原片：环居中、直径约 56vw，状态字就落在环心里，两者是一个整体。
-   关键是把两段弧的缺口都留在正下方 6 点钟方向，底部字幕永远不会被压到。 */
+/* 2.2 版式（Hammond 概念图）里不再出现中央准星；元素保留供测试与回退。 */
 .dsu-reticle {
+  display: none;
   position: absolute;
   left: 50%;
   top: 45%;
@@ -509,8 +621,9 @@
   opacity: 0.85;
 }
 
-/* 读取阶段的十六进制瀑布：放到原片里最空的上右区，不去和主体挤中间 */
+/* 读取阶段的十六进制瀑布：2.2 版式里由左栏自检清单接管，元素保留供测试与回退 */
 .dsu-hex {
+  display: none;
   position: absolute;
   right: 46px;
   top: 22%;
@@ -531,17 +644,68 @@
 }
 .dsu-hex.dsu-in { opacity: 0.6; }
 
-/* ── 交互区 ─────────────────────────────────────────────────────────────── */
+/* ── 开机自检清单（左栏，照概念图）：> ITEM .... OK ────────────────────── */
+.dsu-checklist {
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+.dsu-checklist.dsu-in { opacity: 1; }
+.dsu-check {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  font-family: var(--dsu-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.13em;
+  color: var(--dsu-muted);
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 420ms ease, transform 420ms cubic-bezier(0.16, 0.84, 0.24, 1),
+    color 300ms ease;
+}
+.dsu-checklist.dsu-in .dsu-check { opacity: 1; transform: none; }
+.dsu-check-arrow { font-style: normal; color: var(--dsu-accent); opacity: 0.75; }
+.dsu-check-label { white-space: nowrap; }
+.dsu-check-dots {
+  flex: 1 1 auto;
+  min-width: 18px;
+  border-bottom: 1px dotted var(--dsu-hair-soft);
+  transform: translateY(-3px);
+}
+.dsu-check-state { font-weight: 700; opacity: 0.55; }
+.dsu-check.dsu-done { color: var(--dsu-ink); }
+.dsu-check.dsu-done .dsu-check-state {
+  color: var(--dsu-accent);
+  opacity: 1;
+  text-shadow: 0 0 10px rgba(77, 159, 232, 0.4);
+}
+
+/* 标语（概念图左栏最底部一行小字） */
+.dsu-tagline {
+  margin-top: 16px;
+  font-family: var(--dsu-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  color: var(--dsu-muted);
+  opacity: 0;
+  transition: opacity 560ms ease;
+}
+.dsu-tagline.dsu-in { opacity: 1; }
+
+/* ── 交互区（挪进左栏：按钮 / 身份卡 / 提示）───────────────────────────── */
 .dsu-action {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 60%;
+  position: relative;
   z-index: 26;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
+  margin-top: 20px;
   opacity: 0;
   pointer-events: none;
   transition: opacity 320ms ease;
@@ -840,32 +1004,31 @@
 }
 
 /* ── 页脚 / 字幕 / 进度条 ───────────────────────────────────────────────── */
+/* 页脚（照概念图挪到左下角）：第一行 "HARNESS v2.2.0"（自动），第二行版权行 */
 .dsu-foot {
   position: absolute;
-  right: 46px;
-  bottom: 52px;
+  left: 46px;
+  bottom: 40px;
   z-index: 24;
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
   font-family: var(--dsu-mono);
-  font-size: 11px;
+  font-size: 10.5px;
   letter-spacing: 0.2em;
   color: var(--dsu-ink);
   opacity: 0;
-  transform: translateX(18px);
+  transform: translateX(-18px);
   transition: opacity 560ms ease, transform 560ms cubic-bezier(0.16, 0.84, 0.24, 1);
   transition-delay: 300ms;
 }
 .dsu-foot.dsu-in { opacity: 1; transform: none; }
-.dsu-foot i {
-  display: block;
-  width: 0;
-  height: 7px;
-  background: var(--dsu-ink);
-  transition: width 720ms cubic-bezier(0.2, 0.9, 0.2, 1) 460ms;
+.dsu-foot-v {
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  color: var(--dsu-muted);
 }
-.dsu-foot.dsu-in i { width: 26px; }
 
 .dsu-subtitle {
   position: absolute;
@@ -902,62 +1065,64 @@
 }
 .dsu-sub-en2.dsu-in { opacity: 0.85; transform: none; }
 
-/* 底部进度：照原片收成中间一小段，不再横贯整屏跟字幕抢注意力 */
+/* 底部进度：挪进左栏（照概念图横在清单下面），右侧跟百分比读数 */
 .dsu-progress {
-  position: absolute;
-  left: 50%;
-  bottom: 11px;
-  width: min(420px, 32vw);
-  height: 3px;
-  transform: translateX(-50%);
+  position: relative;
+  margin-top: 22px;
+  width: 100%;
+  height: 4px;
   z-index: 26;
-  background: var(--dsu-hair-soft);
+  background: rgba(255, 255, 255, 0.13);
 }
-.dsu-progress::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 3px;
-  height: 5px;
-  background-image: repeating-linear-gradient(90deg, var(--dsu-hair) 0 1px, transparent 1px 30px);
-  background-size: auto 5px;
-  background-position: 0 100%;
-  background-repeat: repeat-x;
-  opacity: 0.8;
-}
+#dsh-startup-root:not(.dsu-dark) .dsu-progress { background: var(--dsu-hair-soft); }
 .dsu-progress i {
   display: block;
   height: 100%;
   width: 0;
-  background: var(--dsu-ink);
-  box-shadow: inset -2px 0 0 var(--dsu-accent);
+  background: linear-gradient(90deg, #7cc4ff 0%, var(--dsu-accent) 70%);
+  box-shadow: 0 0 12px rgba(77, 159, 232, 0.45);
   transition: width 460ms cubic-bezier(0.3, 0.9, 0.25, 1);
 }
+#dsh-startup-root:not(.dsu-dark) .dsu-progress i {
+  background: var(--dsu-ink);
+  box-shadow: inset -2px 0 0 var(--dsu-accent);
+}
 .dsu-progress.dsu-accent i { background: var(--dsu-accent); }
+.dsu-pct {
+  position: absolute;
+  left: calc(100% + 14px);
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--dsu-mono);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--dsu-ink);
+  white-space: nowrap;
+}
 
-/* 阶段计数（左下） */
+/* 阶段计数（右下，页脚挪去左下后补位） */
 .dsu-stepcount {
   position: absolute;
-  left: 46px;
-  bottom: 52px;
+  right: 46px;
+  bottom: 48px;
   z-index: 24;
   font-family: var(--dsu-mono);
   font-size: 11px;
   letter-spacing: 0.22em;
+  text-align: right;
   color: var(--dsu-muted);
   opacity: 0;
-  transform: translateX(-18px);
+  transform: translateX(18px);
   transition: opacity 560ms ease, transform 560ms cubic-bezier(0.16, 0.84, 0.24, 1);
   transition-delay: 400ms;
 }
 .dsu-stepcount.dsu-in { opacity: 1; transform: none; }
 
-/* 跳过 */
+/* 跳过（右上角机构行正下方） */
 .dsu-skip {
   position: absolute;
   right: 46px;
-  top: 48px;
+  top: 122px;
   z-index: 30;
   font-family: var(--dsu-mono);
   font-size: 11px;
@@ -1045,11 +1210,11 @@
   100% { top: 102%; opacity: 0; }
 }
 
-/* 品牌块下方的一行小字：版本 + 实时时钟（时钟点亮主题橙） */
+/* 品牌块下方的一行小字：产品行 + 实时时钟（时钟点亮主题色） */
 .dsu-meta {
   position: absolute;
   left: 46px;
-  top: 170px;
+  top: 162px;
   z-index: 20;
   display: flex;
   align-items: baseline;
@@ -1070,7 +1235,7 @@
 .dsu-slats {
   position: absolute;
   left: 46px;
-  top: 196px;
+  top: 188px;
   z-index: 20;
   display: flex;
   align-items: center;
@@ -1091,11 +1256,11 @@
 .dsu-slat.dsu-past { background: var(--dsu-ink); opacity: 0.3; }
 .dsu-slat.dsu-on { width: 34px; background: var(--dsu-accent); opacity: 1; }
 
-/* 语音播报指示条：出声时点亮主题琥珀并跳动（对应 BT 念状态行的时刻） */
+/* 语音播报指示条：出声时点亮主题色并跳动（右下，身份读数正下方） */
 .dsu-voice {
   position: absolute;
-  left: 46px;
-  bottom: 96px;
+  right: 46px;
+  bottom: 78px;
   z-index: 20;
   display: flex;
   align-items: flex-end;
@@ -1124,6 +1289,24 @@
 @keyframes dsu-voice {
   0%, 100% { height: 20%; }
   50% { height: 100%; }
+}
+
+/* 窄窗口：左栏收窄，右上角机构行让位（身份读数保留，不做窄窗隐藏） */
+@media (max-width: 900px) {
+  .dsu-col { width: min(440px, calc(100vw - 92px)); }
+  .dsu-tr { display: none; }
+}
+
+/* 矮窗口（1366×768 一类）：收紧行距、藏掉次要装饰，保证左栏不撞品牌块 */
+@media (max-height: 860px) {
+  .dsu-col { bottom: 96px; }
+  .dsu-center { margin-top: 20px; }
+  .dsu-headline { font-size: clamp(30px, 4.8vh, 44px); }
+  .dsu-checklist { margin-top: 14px; gap: 5px; }
+  .dsu-meta, .dsu-slats { display: none; }
+}
+@media (max-height: 640px) {
+  .dsu-tagline { display: none; }
 }
 
 /* 无障碍：尊重系统"减少动态效果" */

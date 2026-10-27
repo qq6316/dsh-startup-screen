@@ -268,11 +268,17 @@ check('没有 FAILED 兜底标记', r.windowStub.__DSH_STARTUP_FAILED__ !== true
 
 console.log('\n[2] 生成出来的 markup 完整性')
 for (const cls of [
-  'dsu-plate', 'dsu-vignette', 'dsu-black-inner', 'dsu-wash', 'dsu-brand-1', 'dsu-frame',
+  'dsu-bg', 'dsu-plate', 'dsu-vignette', 'dsu-black-inner', 'dsu-wash', 'dsu-brand-1', 'dsu-frame',
   'dsu-scanline', 'dsu-corner', 'dsu-slats', 'dsu-voice', 'dsu-meta', 'dsu-status-zh',
   'dsu-sub-en', 'dsu-rule', 'dsu-logo', 'dsu-dots', 'dsu-idline', 'dsu-reticle', 'dsu-hex',
   'dsu-welcome', 'dsu-w1', 'dsu-btn', 'dsu-card', 'dsu-skip', 'dsu-foot', 'dsu-sub-zh',
   'dsu-progress', 'dsu-bloom', 'dsu-streak', 'dsu-flash', 'dsu-crt',
+  /* 2.2 Hammond 版式新增：左栏信息列 / 主标题 / 圆徽 / 右上机构行 / 自检清单 */
+  'dsu-col', 'dsu-headline', 'dsu-headline-text', 'dsu-headline-sub', 'dsu-tr',
+  'dsu-roundel', 'dsu-roundel-name', 'dsu-roundel-sub',
+  'dsu-checklist', 'dsu-check', 'dsu-pct', 'dsu-tagline', 'dsu-foot-v',
+  /* 注：dsu-check-label / dsu-check-state 是运行时 el() 构建的行内元素，
+     不在静态 html 模板里，由 [8b] 的源码断言覆盖。 */
 ]) {
   check('markup 含 .' + cls, r.markup.includes(cls))
 }
@@ -353,12 +359,33 @@ console.log('\n[8] 语音素材通道：BT 真声优先、缺素材自动回落 
   check('揭幕前留一拍收尾（不在最后一个音节上直接进主界面）',
     /\.then\(function \(\) \{ return welcome \}\)\s*\.then\(function \(\) \{ return wait\(ms\(280\)\) \}\)/.test(src))
   check('运行时版本横幅（控制台一眼看出跑的是哪份代码）',
-    /RUNTIME_VERSION = '2\.1\.5'/.test(src) && src.includes("[dsh-startup-screen] 运行时 v' + RUNTIME_VERSION"))
+    /RUNTIME_VERSION = '2\.2\.0'/.test(src) && src.includes("[dsh-startup-screen] 运行时 v' + RUNTIME_VERSION"))
   check('素材加载结果暴露 __DSH_STARTUP_ASSETS__（401/404/解码失败可查）',
     src.includes('__DSH_STARTUP_ASSETS__') && src.includes("素材 ' + name + ' 不可用"))
   check('素材拿不到时按 .mp3 → .wav → .ogg 依次尝试', /\.mp3'\)\.then/.test(src) && /\.wav'\)\.then/.test(src) && /\.ogg'\)\.then/.test(src))
   check('AudioContext 被自动播放策略挂起时不排队素材（防挂死）+ 走 TTS',
     /c\.state !== 'running' \|\| !buf/.test(src) && /audio\.canPlay\(\)/.test(src))
+}
+
+console.log('\n[8b] 2.2 Hammond 版式：自检清单 / 百分比 / 背景图 / 待命状态行')
+{
+  const src = fs.readFileSync(BUNDLE, 'utf8')
+  check('自检清单五项齐全（LOADING PILOT PROFILE → FINALIZING BOOT SEQUENCE）',
+    src.includes("'LOADING PILOT PROFILE'") &&
+    src.includes("'INITIALIZING TITAN INTERFACE'") &&
+    src.includes("'SYNCING NEURAL LINK'") &&
+    src.includes("'ESTABLISHING COMMS'") &&
+    src.includes("'FINALIZING BOOT SEQUENCE'"))
+  check('清单打点接好：底板点亮 tickCheck(0)、每步 tickCheck(n)、终幕 tickCheck(6)',
+    /tickCheck\(0\)/.test(src) && /tickCheck\(n\)/.test(src) && /tickCheck\(6\)/.test(src))
+  check('进度条带百分比读数（setProgress 同步更新 .dsu-pct）',
+    /ui\.pct\.textContent = Math\.round\(pct \* 100\) \+ '%'/.test(src))
+  check('背景图按 bg.jpg → bg.png → bg.webp 依次尝试，缺图回落纯色底板',
+    /'jpg', 'png', 'webp'/.test(src) && /回落纯色底板/.test(src))
+  check('没有 Image 的环境（Node 桩）安全跳过背景图加载', /typeof Image !== 'function'/.test(src))
+  check('背景图结果写进 __DSH_STARTUP_ASSETS__.bg', /__DSH_STARTUP_ASSETS__\.bg = state/.test(src))
+  check('底板点亮后状态行先待命（INITIATING...）',
+    src.includes("typeIn(ui.statusZh, '初始化', 46)") && src.includes("typeIn(ui.subEn, 'INITIATING...', 13)"))
 }
 
 console.log('\n[9] 右下角身份读数：不压版心、窄窗口不丢、第 3 幕随身份核验退场')

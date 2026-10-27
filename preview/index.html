@@ -156,6 +156,7 @@
     enabled: true,
     mode: 'always',
     theme: 'dark',
+    bg: true,
     speed: 1,
     requireInteraction: true,
     allowSkip: true,
@@ -163,16 +164,22 @@
     identity: 'JACK COOPER',
     identityId: 'BT-7274',
     accessLevel: 'PILOT',
-    brand1: 'MILITIA',
-    brand2: 'FREE FRONTIER',
-    brand3a: 'SRS',
-    brand3b: 'MK.7',
+    brand1: 'TITANFALL',
+    brand2: '2',
+    brand3a: 'H',
+    brand3b: 'Hammond',
+    logoSub: 'ROBOTICS',
+    headline: 'HARNESS',
+    headlineSub: 'IMC / HAMMOND PILOT ASSIST SYSTEM',
+    orgTag: 'IMC / HAMMOND ROBOTICS',
+    sysLine: 'ADVANCED PILOT SYSTEMS',
+    tagline: 'BETTER HUMANS. STRONGER TOGETHER.',
     orgZh: '自由边境',
     orgEn: 'MILITIA',
     orgSub: 'VANGUARD CLASS · TITAN OS',
     welcomeBox: 'BT-7274',
-    footer: 'POWERED BY TITAN OS',
-    accent: '#ff9a1f',
+    footer: 'PROPERTY OF HAMMOND ROBOTICS',
+    accent: '#4d9fe8',
     glitchA: '#ff3b30',
     glitchB: '#2971b8'
   };
@@ -263,7 +270,8 @@
 
     <div class="note">
       六段序列：<b>需要铁驭链接</b> → 神经握手同步 → 接收任务指令 → 系统自检开始 → 全系统正常 → 协议三·保护铁驭。
-      第 1、2 步可交互（按钮 / Enter / 空格）。
+      第 1、2 步可交互（按钮 / Enter / 空格）。2.2 版式照 Hammond Robotics / HARNESS 概念图重制：
+      左栏 TITANFALL|2 徽标 → 圆徽 → / HARNESS → 状态行 → 自检清单 → 进度条 → 标语，背景图 lib/assets/bg.jpg（缺图回落纯色底板）。
     </div>
     <div class="note">离线预览不写入 DSH；正式插件的配置存在 <code>~/.dsh/dsh-startup.json</code>。</div>
   </div>
@@ -330,12 +338,12 @@
             <div class="__ss_groupTitle">视觉</div>
             <div class="__ss_field"><label class="__ss_label">主题</label>
               <select class="__ss_select" id="sTheme">
-                <option value="dark" selected>深色 · 军用 HUD 底板（默认）</option>
+                <option value="dark" selected>深色 · 军工 HUD + 背景图（默认）</option>
                 <option value="light">浅色 · 暖白档案底板</option>
               </select>
             </div>
             <div class="__ss_two">
-              <div class="__ss_field"><label class="__ss_label">强调色 · 琥珀</label><div class="__ss_row"><input class="__ss_swatch" type="color" value="#ff9a1f" id="sAccent"><span class="__ss_status">#ff9a1f</span></div></div>
+              <div class="__ss_field"><label class="__ss_label">强调色 · 钢蓝</label><div class="__ss_row"><input class="__ss_swatch" type="color" value="#4d9fe8" id="sAccent"><span class="__ss_status">#4d9fe8</span></div></div>
               <div class="__ss_field"><label class="__ss_label">故障色 · 蓝</label><div class="__ss_row"><input class="__ss_swatch" type="color" value="#2971b8" id="sGlitch"><span class="__ss_status">#2971b8</span></div></div>
             </div>
           </div>
@@ -343,10 +351,13 @@
           <div class="__ss_group">
             <div class="__ss_groupTitle">文案</div>
             <div class="__ss_two">
-              <div class="__ss_field"><label class="__ss_label">左上 · 主标题</label><input class="__ss_input" type="text" value="MILITIA" id="sBrand1"></div>
-              <div class="__ss_field"><label class="__ss_label">左上 · 产品行</label><div class="__ss_row"><input class="__ss_input" type="text" value="SRS" id="sBrand3a" style="flex:1"><span class="__ss_status">+</span><input class="__ss_input" type="text" value="MK.7" id="sBrand3b" style="flex:0 0 60px"></div></div>
+              <div class="__ss_field"><label class="__ss_label">左上 · 主字</label><input class="__ss_input" type="text" value="TITANFALL" id="sBrand1"></div>
+              <div class="__ss_field"><label class="__ss_label">左上 · 编号</label><input class="__ss_input" type="text" value="2" id="sBrand2" maxlength="12"></div>
             </div>
-            <div class="__ss_field"><label class="__ss_label">左上 · 副标题</label><input class="__ss_input" type="text" value="FREE FRONTIER" maxlength="40" id="sBrand2"></div>
+            <div class="__ss_two">
+              <div class="__ss_field"><label class="__ss_label">圆徽 · 字母</label><input class="__ss_input" type="text" value="H" id="sBrand3a" maxlength="3"></div>
+              <div class="__ss_field"><label class="__ss_label">圆徽 · 名称</label><input class="__ss_input" type="text" value="Hammond" id="sBrand3b"></div>
+            </div>
             <div class="__ss_two">
               <div class="__ss_field"><label class="__ss_label">黑幕 · 中文</label><input class="__ss_input" type="text" value="自由边境" id="sOrgZh"></div>
               <div class="__ss_field"><label class="__ss_label">黑幕 · 英文</label><input class="__ss_input __ss_inputMono" type="text" value="MILITIA" id="sOrgEn"></div>
@@ -355,7 +366,7 @@
               <div class="__ss_field"><label class="__ss_label">黑幕 · 小字</label><input class="__ss_input __ss_inputMono" type="text" value="VANGUARD CLASS · TITAN OS" id="sOrgSub"></div>
               <div class="__ss_field"><label class="__ss_label">终幕 · 黑框</label><input class="__ss_input" type="text" value="BT-7274" id="sWelcomeBox"></div>
             </div>
-            <div class="__ss_field"><label class="__ss_label">右下 · 页脚</label><input class="__ss_input __ss_inputMono" type="text" value="POWERED BY TITAN OS" id="sFooter"></div>
+            <div class="__ss_field"><label class="__ss_label">左下 · 页脚</label><input class="__ss_input __ss_inputMono" type="text" value="PROPERTY OF HAMMOND ROBOTICS" id="sFooter"></div>
           </div>
 
           <div class="__ss_preview">
@@ -547,11 +558,11 @@
     $('sLevel').value = 'PILOT'; $('sTheme').value = 'dark';
     $('sSpeed').value = 1; $('sSpeedVal').textContent = '1.00×';
     $('sInteract').checked = true; $('sSkip').checked = true; $('sSound').checked = false;
-    $('sBrand1').value = 'MILITIA'; $('sBrand2').value = 'FREE FRONTIER';
-    $('sBrand3a').value = 'SRS'; $('sBrand3b').value = 'MK.7';
+    $('sBrand1').value = 'TITANFALL'; $('sBrand2').value = '2';
+    $('sBrand3a').value = 'H'; $('sBrand3b').value = 'Hammond';
     $('sOrgZh').value = '自由边境'; $('sOrgEn').value = 'MILITIA';
     $('sOrgSub').value = 'VANGUARD CLASS · TITAN OS'; $('sWelcomeBox').value = 'BT-7274';
-    $('sFooter').value = 'POWERED BY TITAN OS';
+    $('sFooter').value = 'PROPERTY OF HAMMOND ROBOTICS';
     $('sNotice').textContent = '已恢复默认。';
   });
 
