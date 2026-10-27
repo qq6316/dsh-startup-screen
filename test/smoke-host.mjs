@@ -149,17 +149,16 @@ r = await call('prefix /dsh-startup/asset', 'GET', undefined, '/dsh-startup/asse
 check('目录穿越被拒 -> 404', r.statusCode === 404, String(r.statusCode))
 r = await call('prefix /dsh-startup/asset', 'GET', undefined, '/dsh-startup/asset/nope.mp3')
 check('不存在的素材 -> 404', r.statusCode === 404, String(r.statusCode))
-for (const f of ['line-1', 'line-2', 'line-3', 'line-4', 'line-5']) {
-  const rr = await call('prefix /dsh-startup/asset', 'GET', undefined, '/dsh-startup/asset/' + f + '.mp3')
-  check('真声素材 ' + f + '.mp3 -> 200', rr.statusCode === 200 && rr.body.length > 5000, rr.statusCode + ' ' + rr.body.length)
-}
+r = await call('prefix /dsh-startup/asset', 'GET', undefined, '/dsh-startup/asset/sfx-ticks-run.mp3')
+check('sfx-ticks-run.mp3 -> 200 + audio/mpeg', r.statusCode === 200 && r.headers['Content-Type'] === 'audio/mpeg', r.headers['Content-Type'])
+check('sfx-ticks-run.mp3 有内容', r.body.length > 5000, r.body.length + ' bytes')
 
 console.log('\n[4] 配置读写落盘')
 r = await call('exact /dsh-startup/config')
 let cfg = JSON.parse(r.body)
 check('GET config ok', cfg.ok === true)
-check('默认身份名称 = JOYCE MOORE', cfg.config.identity === 'JOYCE MOORE', cfg.config.identity)
-check('默认身份编号 = 0087', cfg.config.identityId === '0087', cfg.config.identityId)
+check('默认铁驭名称 = JACK COOPER', cfg.config.identity === 'JACK COOPER', cfg.config.identity)
+check('默认泰坦编号 = BT-7274', cfg.config.identityId === 'BT-7274', cfg.config.identityId)
 check('返回了配置文件路径', typeof cfg.file === 'string' && cfg.file.startsWith(SMOKE_HOME), cfg.file)
 check('返回了插件版本号（设置面板顶部要显示它）', typeof cfg.version === 'string' && /^\d+\.\d+\.\d+/.test(cfg.version), cfg.version)
 
@@ -172,17 +171,17 @@ check('enabled 字符串 "true" 被转成 boolean true', cfg.config.enabled === 
 check('配置已落盘', fs.existsSync(path.join(SMOKE_HOME, 'dsh-startup.json')))
 
 r = await call('exact /dsh-startup/config', 'POST', JSON.stringify({ patch: { identityId: '' } }))
-check('身份编号留空 + 纯中文名 → 兜底 OPERATOR', JSON.parse(r.body).config.identityId === 'OPERATOR', JSON.parse(r.body).config.identityId)
+check('泰坦编号留空 + 纯中文名 → 兜底 PILOT', JSON.parse(r.body).config.identityId === 'PILOT', JSON.parse(r.body).config.identityId)
 r = await call('exact /dsh-startup/config', 'POST', JSON.stringify({ patch: { identity: 'Ada Lovelace', identityId: '' } }))
 check('身份编号留空 + 英文名 → 自动派生 ADALOVELACE', JSON.parse(r.body).config.identityId === 'ADALOVELACE', JSON.parse(r.body).config.identityId)
 r = await call('exact /dsh-startup/config', 'POST', JSON.stringify({ patch: { speed: 0.01, theme: 'neon', accent: 'javascript:alert(1)' } }))
 cfg = JSON.parse(r.body)
 check('speed 低于下限被夹到 0.35', cfg.config.speed === 0.35, String(cfg.config.speed))
-check('非法 theme 回落到 light', cfg.config.theme === 'light', cfg.config.theme)
-check('非法颜色回落到默认橙', cfg.config.accent === '#ff7500', cfg.config.accent)
+check('非法 theme 回落到 dark（军用 HUD 出厂默认）', cfg.config.theme === 'dark', cfg.config.theme)
+check('非法颜色回落到默认琥珀', cfg.config.accent === '#ff9a1f', cfg.config.accent)
 
 r = await call('exact /dsh-startup/config', 'POST', JSON.stringify({ action: 'reset' }))
-check('reset 恢复默认', JSON.parse(r.body).config.identity === 'JOYCE MOORE')
+check('reset 恢复默认', JSON.parse(r.body).config.identity === 'JACK COOPER')
 
 r = await call('exact /dsh-startup/config', 'POST', '{ not json')
 check('非法 JSON 返回 400', r.statusCode === 400, String(r.statusCode))

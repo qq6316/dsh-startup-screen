@@ -1,14 +1,15 @@
 /* ============================================================================
  * dsh-startup-screen — 启动界面 / 启动动画样式
  * ----------------------------------------------------------------------------
- * 风格取自参考片（Hypergryph 式开机序列）：黑色序幕 → 灰白过曝洗白 → 暖白
- * "技术档案" 底板 → 等宽字距状态行 → 环形准星扫描 → WELCOME 版式 → 色散故障。
+ * 2.0 起照《泰坦陨落 2》（Titanfall 2）BT-7274 的开机语汇重排：
+ * 黑色序幕 → 过曝洗白 → 军用"技术档案"底板（默认暗色 + 扫描线）→
+ * 等宽字距状态行 → 环形准星扫描 → PROTOCOL 3 版式 → 色散故障。
  *
  * 全部字体都取系统自带字体，零网络依赖：
- *   --dsu-din   Bahnschrift（Windows 10+ 自带 DIN 1451 风格，对应参考片里
- *               "RHINE LAB / SYNTHESIZE INFORMATION" 那种窄体技术字）
- *   --dsu-mono  Cascadia Mono / Consolas（对应参考片里的等宽字距小字）
- *   --dsu-zh    微软雅黑（对应参考片底部中文小字幕）
+ *   --dsu-din   Bahnschrift（Windows 10+ 自带 DIN 1451 风格 —— 正是泰坦陨落
+ *               HUD 那种窄体技术字）
+ *   --dsu-mono  Cascadia Mono / Consolas（等宽字距小字 / 自检流水）
+ *   --dsu-zh    微软雅黑（底部中文小字幕）
  * ========================================================================== */
 
 #dsh-startup-root,
@@ -156,7 +157,36 @@
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='120' height='120' filter='url(%23n)' opacity='0.6'/></svg>");
 }
 
-/* ── 第一幕：黑幕 + DeepSeek 标识 ─────────────────────────────────────── */
+/* ── 军用 CRT 扫描线：底板点亮后一直铺在背景上（2.0 · TF2 HUD）──────────
+   只压底板不压文字：z-index 12 在 vignette(13) 之下、内容(20+)更之下。
+   浅色主题用乘法黑线，暗色主题换成极淡的白线并降低不透明度。 */
+.dsu-crt {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 900ms ease;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.14) 3px,
+    rgba(0, 0, 0, 0) 4px
+  );
+}
+.dsu-dark .dsu-crt {
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 0px,
+    rgba(255, 255, 255, 0) 2px,
+    rgba(255, 255, 255, 0.045) 3px,
+    rgba(255, 255, 255, 0) 4px
+  );
+}
+.dsu-crt.dsu-in { opacity: 1; }
+
+/* ── 第一幕：黑幕 + 军徽 ───────────────────────────────────────────────── */
 .dsu-black {
   position: absolute;
   inset: 0;
@@ -184,11 +214,11 @@
   transform: scale(1.045);
   transition: opacity 620ms ease, transform 620ms ease;
 }
-.dsu-whale {
+.dsu-emblem {
   display: block;
   fill: currentColor;
 }
-.dsu-black .dsu-whale {
+.dsu-black .dsu-emblem {
   width: 122px;
   height: 122px;
   color: #fff;
@@ -1061,7 +1091,7 @@
 .dsu-slat.dsu-past { background: var(--dsu-ink); opacity: 0.3; }
 .dsu-slat.dsu-on { width: 34px; background: var(--dsu-accent); opacity: 1; }
 
-/* 女声播报指示条：出声时点亮主题橙并跳动（对应参考片里女声念状态行的时刻） */
+/* 语音播报指示条：出声时点亮主题琥珀并跳动（对应 BT 念状态行的时刻） */
 .dsu-voice {
   position: absolute;
   left: 46px;

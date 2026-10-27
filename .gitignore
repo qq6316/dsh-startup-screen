@@ -1,0 +1,16 @@
+# 编辑器
+.idea/
+.vscode/
+
+# 构建产物 / npm 缓存
+*.tgz
+.npm-cache/
+
+# 第三方语音素材源包（版权原因不入库，本地备份于 BT语音素材包/）
+BT语音素材包/
+lib/assets/*.zip
+
+# 日志 / 临时文件
+*.log
+.DS_Store
+Thumbs.db

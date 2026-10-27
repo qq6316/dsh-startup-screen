@@ -113,12 +113,14 @@ const spoken = []
 function makeSpeech() {
   return {
     /* 故意混入"老拼接合成"音色：David(男) / Zira(女) / Huihui(女)，
-       正确的选择应该跳过它们，挑 Online (Natural) 那两个 */
+       正确的英文选择应该跳过它们和女声 Aria，挑男声 Online (Natural) 的 Guy；
+       中文播报仍挑女声 Xiaoxiao */
     _voices: [
       { name: 'Microsoft David Desktop - English (United States)', lang: 'en-US', localService: true },
       { name: 'Microsoft Zira Desktop - English (United States)', lang: 'en-US', localService: true },
       { name: 'Microsoft Huihui Desktop - Chinese (Simplified)', lang: 'zh-CN', localService: true },
       { name: 'Microsoft Aria Online (Natural) - English (United States)', lang: 'en-US', localService: false },
+      { name: 'Microsoft Guy Online (Natural) - English (United States)', lang: 'en-US', localService: false },
       { name: 'Microsoft Xiaoxiao Online (Natural) - Chinese (Mainland)', lang: 'zh-CN', localService: false },
     ],
     getVoices() { return this._voices },
@@ -161,9 +163,9 @@ function run(withSpeech, cfgOverride, env) {
   const timers = []
   const windowStub = {
     __DSH_STARTUP__: {
-      enabled: true, mode: 'always', theme: 'light', speed: 1,
+      enabled: true, mode: 'always', theme: 'dark', speed: 1,
       requireInteraction: true, allowSkip: true,
-      identity: 'JOYCE MOORE', identityId: '0087', accessLevel: '3',
+      identity: 'JACK COOPER', identityId: 'BT-7274', accessLevel: 'PILOT',
       /* 只覆盖测试要变的；语速/音调/留白故意留空，好让断言直接校验 splash.js 出厂默认值 */
       voice: true, voiceLang: 'en', voiceName: '',
       sound: true, soundVolume: 0.5,
@@ -270,7 +272,7 @@ for (const cls of [
   'dsu-scanline', 'dsu-corner', 'dsu-slats', 'dsu-voice', 'dsu-meta', 'dsu-status-zh',
   'dsu-sub-en', 'dsu-rule', 'dsu-logo', 'dsu-dots', 'dsu-idline', 'dsu-reticle', 'dsu-hex',
   'dsu-welcome', 'dsu-w1', 'dsu-btn', 'dsu-card', 'dsu-skip', 'dsu-foot', 'dsu-sub-zh',
-  'dsu-progress', 'dsu-bloom', 'dsu-streak', 'dsu-flash',
+  'dsu-progress', 'dsu-bloom', 'dsu-streak', 'dsu-flash', 'dsu-crt',
 ]) {
   check('markup 含 .' + cls, r.markup.includes(cls))
 }
@@ -284,38 +286,38 @@ check('初始化不抛异常', r.thrown === null, r.thrown && r.thrown.message)
 check('照样摘掉黑幕', !r.root.classList.contains('dsu-boot'), '当前 class = ' + r.root._cls)
 check('暴露了 API', !!r.windowStub.__DSH_STARTUP_API__)
 
-console.log('\n[5] 音色挑选：必须跳过拼接合成音色，挑神经网络女声')
+console.log('\n[5] 音色挑选：英文台词挑神经网络男声（BT），中文播报挑女声')
 r = run(true)
 let api = r.windowStub.__DSH_STARTUP_API__
 check('默认 voiceName 留空 = 自动挑', api.config.voiceName === '')
-api.speak('Access permission required.')
+api.speak('Pilot link required.')
 let u = r.spoken[r.spoken.length - 1]
 let vname = u && u.voice ? u.voice.name : '(未设置 voice)'
-check('英文挑到 Aria Online (Natural)，而不是 David/Zira', /aria/i.test(vname) && /natural|online/i.test(vname), vname)
-check('不是男声 David', !/david/i.test(vname), vname)
+check('英文挑到 Guy Online (Natural)，而不是 Aria/Zira', /guy/i.test(vname) && /natural|online/i.test(vname), vname)
+check('不是女声 Aria / Zira', !/aria|zira/i.test(vname), vname)
 
 r = run(true, { voiceLang: 'zh' })
 api = r.windowStub.__DSH_STARTUP_API__
-api.speak('Access permission required.', '需要访问许可')
+api.speak('Pilot link required.', '需要铁驭链接')
 u = r.spoken[r.spoken.length - 1]
 vname = u && u.voice ? u.voice.name : '(未设置 voice)'
 check('中文挑到 Xiaoxiao Online (Natural)，而不是 Huihui', /xiaoxiao/i.test(vname) && /natural|online/i.test(vname), vname)
 
 r = run(true, { voiceLang: 'both' })
 api = r.windowStub.__DSH_STARTUP_API__
-api.speak('Verification passed.', '验证通过')
+api.speak('All systems nominal.', '全系统正常')
 const names = r.spoken.map((x) => (x.voice ? x.voice.name : '')).filter(Boolean)
 check('中英各念一遍 = 排了两条 utterance', r.spoken.length === 2, String(r.spoken.length))
-check('中文用中文音色、英文用英文音色', names.some((n) => /xiaoxiao/i.test(n)) && names.some((n) => /aria/i.test(n)), names.join(' | '))
+check('中文用中文音色、英文用英文音色', names.some((n) => /xiaoxiao/i.test(n)) && names.some((n) => /guy/i.test(n)), names.join(' | '))
 
 console.log('\n[6] 播报语调节奏与名字念法')
 r = run(true)
 api = r.windowStub.__DSH_STARTUP_API__
-api.speak('Identity verification.')
+api.speak('Initiating neural handshake.')
 u = r.spoken[r.spoken.length - 1]
-check('语速落在电影旁白档（0.8–0.95，比朗读慢）', u.rate >= 0.8 && u.rate <= 0.95, String(u.rate))
-check('音调压低（0.78–0.92，深沉）', u.pitch >= 0.78 && u.pitch <= 0.92, String(u.pitch))
-check('名字全大写会转 Title Case（避免逐字母念）', api.speakName('JOYCE MOORE') === 'Joyce Moore', api.speakName('JOYCE MOORE'))
+check('语速落在 BT 播报档（0.8–0.95，比朗读慢）', u.rate >= 0.8 && u.rate <= 0.95, String(u.rate))
+check('音调压低（0.78–0.92，低沉男声）', u.pitch >= 0.78 && u.pitch <= 0.92, String(u.pitch))
+check('名字全大写会转 Title Case（避免逐字母念）', api.speakName('JACK COOPER') === 'Jack Cooper', api.speakName('JACK COOPER'))
 check('中文名字原样不动', api.speakName('琉璃') === '琉璃', api.speakName('琉璃'))
 check('API 暴露了 voice 供设置页显示', typeof api.voice === 'string')
 
@@ -325,24 +327,38 @@ api = r.windowStub.__DSH_STARTUP_API__
 const speech = r.windowStub.speechSynthesis
 check('voiceLead 默认 240ms（提示音后留一拍再开口）', api.config.voiceLead === 240, String(api.config.voiceLead))
 speech.cancelCalls = 0
-api.speak('Access permission required.')
-api.speak('Identity verification.')
-api.speak('Access request received.')
+api.speak('Pilot link required.')
+api.speak('Initiating neural handshake.')
+api.speak('Mission directive received.')
 check('连播三句，cancel 一次都没调用（队列顺序播报）', speech.cancelCalls === 0, 'cancel ' + speech.cancelCalls + ' 次')
 check('三句都排进了队列', r.spoken.length === 3, String(r.spoken.length))
 speech.cancelCalls = 0
 api.skip()
 check('按跳过时才真的掐断（cancel 1 次）', speech.cancelCalls === 1, 'cancel ' + speech.cancelCalls + ' 次')
 
-console.log('\n[8] 终幕用真声欢迎语（来自 Video Project 3 的 line-6）')
+console.log('\n[8] 语音素材通道：BT 真声优先、缺素材自动回落 TTS')
 {
   const src = fs.readFileSync(BUNDLE, 'utf8')
-  check('全程没有 voice.tts( 调用（不再用 TTS 念白）', !/voice\.tts\(/.test(src))
-  check('终幕挂了 line-6 素材', /voice\.line\(null, null, 'line-6'\)/.test(src))
-  check('揭幕前会等欢迎语播完', /\.then\(function \(\) \{ return welcome \}\)/.test(src))
-  check('预加载包含 line-6', /ensureAsset\('line-6'\)/.test(src))
-  check('五步仍然各自挂着真声素材', (src.match(/audio: 'line-/g) || []).length === 5)
-  check('总共 6 份人声素材被引用', (src.match(/'line-[1-6]'/g) || []).length >= 6)
+  check('五步各挂一段 BT 真声素材槽位', (src.match(/audio: 'line-/g) || []).length === 5)
+  check('步骤语音调用点真的把素材槽位递进去（2.0 曾漏传导致永远 TTS）',
+    /voice\.line\(step\.say, step\.zh, step\.audio\)/.test(src))
+  check('终幕协议三也挂素材（line-6）', /voice\.line\('Protocol three\. Protect the pilot\.', '协议三 · 保护铁驭', 'line-6'\)/.test(src))
+  check('揭幕前会等播报结束', /\.then\(function \(\) \{ return welcome \}\)/.test(src))
+  check('素材预加载包含终幕', /ensureAsset\('line-6'\)/.test(src))
+  check('voiceSource 出厂默认 asset', /voiceSource: 'asset'/.test(src))
+  check('素材缺失会回落 TTS', /return ttsLine\(en, zh\)/.test(src))
+  check('五步各带一句英文播报台词（TTS 回落用）', (src.match(/say: '/g) || []).length === 5)
+  check('看门狗在引擎真正开口（onstart）后重新起表（防在线音色延迟掐断语音）',
+    /u\.onstart = function \(\) \{\s*setMeter\(true\)[\s\S]*?watchdog = setTimeout\(settle, est \+ 1500\)/.test(src))
+  check('揭幕前留一拍收尾（不在最后一个音节上直接进主界面）',
+    /\.then\(function \(\) \{ return welcome \}\)\s*\.then\(function \(\) \{ return wait\(ms\(280\)\) \}\)/.test(src))
+  check('运行时版本横幅（控制台一眼看出跑的是哪份代码）',
+    /RUNTIME_VERSION = '2\.1\.5'/.test(src) && src.includes("[dsh-startup-screen] 运行时 v' + RUNTIME_VERSION"))
+  check('素材加载结果暴露 __DSH_STARTUP_ASSETS__（401/404/解码失败可查）',
+    src.includes('__DSH_STARTUP_ASSETS__') && src.includes("素材 ' + name + ' 不可用"))
+  check('素材拿不到时按 .mp3 → .wav → .ogg 依次尝试', /\.mp3'\)\.then/.test(src) && /\.wav'\)\.then/.test(src) && /\.ogg'\)\.then/.test(src))
+  check('AudioContext 被自动播放策略挂起时不排队素材（防挂死）+ 走 TTS',
+    /c\.state !== 'running' \|\| !buf/.test(src) && /audio\.canPlay\(\)/.test(src))
 }
 
 console.log('\n[9] 右下角身份读数：不压版心、窄窗口不丢、第 3 幕随身份核验退场')

@@ -19,7 +19,7 @@
 ```bash
 # 1) 先完全退出 DeepSeek Harness Desktop（进程不要留着）
 # 2) 再装
-dsh plugin --profile desktop add ./dsh-startup-screen-1.1.2.tgz
+dsh plugin --profile desktop add ./dsh-startup-screen-2.1.0.tgz
 # 3) 重新打开桌面端
 ```
 
@@ -56,8 +56,9 @@ then fully quit it before running dsh plugin --profile desktop.
 ### 桌面端标题栏（Windows）
 
 桌面端用 `titleBarOverlay`（Windows Controls Overlay）画最小化 / 最大化 / 关闭三个按钮，
-其底色跟随应用主题。启动动画第一幕是纯黑、第二幕是暖白档案底板，于是右上角会留一块
-与应用主题同色的方块 —— 黑幕阶段像一条亮带，暖白底板阶段三个深色图标压在浅色块上。
+其底色跟随应用主题。启动动画第一幕是纯黑、第二幕是档案底板（2.0 起默认为暗色
+军用 HUD），于是右上角会留一块与应用主题同色的方块 —— 黑幕阶段像一条亮带，
+浅色底板阶段三个深色图标压在浅色块上。
 
 从 1.1.2 起，播放期间把这层 overlay **整层透明化**：插件把桌面端 preload 用来测色的
 隐藏探针改成 `rgba(0, 0, 0, 0)`，逼它发出
@@ -112,19 +113,24 @@ then fully quit it before running dsh plugin --profile desktop.
 
 ## 四、验证情况
 
+> 2.0（泰坦陨落 2 版）改动后的回归：四套冒烟测试 **225 项断言全部通过**
+> （host 56 / splash 84 / client 40 / desktop-boot 45）。桌面端实机验证记录
+> 来自 1.1.x 时期，2.0 只改了台词、默认值与音效来源，桌面端适配机制未动。
+
 | 验证项 | 状态 |
 |---|---|
-| 四套冒烟测试（227 项断言） | ✅ 通过 |
+| 四套冒烟测试（225 项断言，2.0 回归） | ✅ 通过 |
 | 真实 `dist/index.html` 上的注入产物 | ✅ 通过（隔离环境实测） |
-| 隔离 DSH 实例的真实 HTTP 全链路（index 注入 / 三条路由 / 7 段音频素材 / 配置读写 / 401 信任栅栏） | ✅ 通过 |
+| 隔离 DSH 实例的真实 HTTP 全链路（index 注入 / 三条路由 / 界面音效素材 / 配置读写 / 401 信任栅栏） | ✅ 通过 |
 | 没有 `webServer` 的降级路径不抛异常 | ✅ 通过 |
-| 浏览器半侧自举逻辑（DOM stub 跑真代码） | ✅ 通过 41 项断言 |
-| **桌面端实机**（真实 Electron 里看到完整动画） | ✅ **通过** |
+| 浏览器半侧自举逻辑（DOM stub 跑真代码） | ✅ 通过 |
+| **桌面端实机**（真实 Electron 里看到完整动画，1.1.x 实测） | ✅ **通过** |
 
-桌面端实测（DeepSeek Harness Desktop，内核 `0.2.0-rc.2`）：
+桌面端实测（DeepSeek Harness Desktop，内核 `0.2.0-rc.2`，1.1.x 时期记录）：
 
 - 六幕动画完整播放，无白闪、无残留黑幕
-- 8 段音频全部走 `lib/assets/` 的真声素材，未回落 TTS
+- 1.1.x 时代 8 段音频走 `lib/assets/` 真声素材；**2.0 起台词改英文 TTS 播报**，
+  `lib/assets/` 只保留两段界面音效
 - 设置页出现「启动动画」，配置正确落在 `%USERPROFILE%\.dsh\dsh-startup.json`
 - 三条路由 `/dsh-startup/splash.js`、`/dsh-startup/splash.css`、`/dsh-startup/config`
   由安装前的 **404** 变为 **401**（401 是插件自己的信任栅栏，说明路由已注册）

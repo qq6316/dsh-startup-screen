@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
@@ -138,9 +138,9 @@
     <div class="body">
       <div class="bubble me">给我做一个启动界面插件，风格照这个视频来</div>
       <div class="bubble ai">
-        启动动画已经按参考片的语汇重做了一遍：黑幕 DeepSeek 标识 → 过曝洗白 → 暖白技术档案底板 →<br>
-        需要访问许可 / 身份资料确认 / 接收访问需求 / 读取完毕 / 验证通过 / 欢迎 xxx 访问。<br>
-        身份名称在设置页「启动动画」里改，中英双语字幕同步。
+        启动动画已经按《泰坦陨落 2》BT-7274 的开机语汇重做了一遍：黑幕军徽 → 过曝洗白 → 军用档案底板 →<br>
+        需要铁驭链接 / 神经握手同步 / 接收任务指令 / 系统自检开始 / 全系统正常 / 协议三·保护铁驭。<br>
+        铁驭名称在设置页「启动动画」里改，中英双语字幕同步。
       </div>
     </div>
   </div>
@@ -155,24 +155,24 @@
   window.__DSH_STARTUP__ = {
     enabled: true,
     mode: 'always',
-    theme: 'light',
+    theme: 'dark',
     speed: 1,
     requireInteraction: true,
     allowSkip: true,
     sound: false,
-    identity: 'JOYCE MOORE',
-    identityId: '0087',
-    accessLevel: '3',
-    brand1: 'DEEPSEEK',
-    brand2: 'SYNTHESIZE INTELLIGENCE',
-    brand3a: 'HARNESS',
-    brand3b: 'OS',
-    orgZh: '深度求索',
-    orgEn: 'DEEPSEEK',
-    orgSub: 'DEEPSEEK HARNESS',
-    welcomeBox: 'DEEPSEEK HARNESS',
-    footer: 'POWERED BY DEEPSEEK',
-    accent: '#ff7500',
+    identity: 'JACK COOPER',
+    identityId: 'BT-7274',
+    accessLevel: 'PILOT',
+    brand1: 'MILITIA',
+    brand2: 'FREE FRONTIER',
+    brand3a: 'SRS',
+    brand3b: 'MK.7',
+    orgZh: '自由边境',
+    orgEn: 'MILITIA',
+    orgSub: 'VANGUARD CLASS · TITAN OS',
+    welcomeBox: 'BT-7274',
+    footer: 'POWERED BY TITAN OS',
+    accent: '#ff9a1f',
     glitchA: '#ff3b30',
     glitchB: '#2971b8'
   };
@@ -188,25 +188,25 @@
   </header>
   <div class="pane">
     <div class="row">
-      <label>身份名称（终幕「欢迎 xxx 访问」）</label>
-      <input type="text" id="fIdentity" value="JOYCE MOORE" maxlength="48">
+      <label>铁驭名称（终幕「保护 xxx」）</label>
+      <input type="text" id="fIdentity" value="JACK COOPER" maxlength="48">
     </div>
     <div class="row2">
       <div class="row">
-        <label>身份编号</label>
-        <input type="text" id="fId" value="0087" maxlength="12">
+        <label>泰坦编号</label>
+        <input type="text" id="fId" value="BT-7274" maxlength="12">
       </div>
       <div class="row">
-        <label>权限等级</label>
-        <input type="text" id="fLevel" value="3" maxlength="32">
+        <label>授权等级</label>
+        <input type="text" id="fLevel" value="PILOT" maxlength="32">
       </div>
     </div>
     <div class="row2">
       <div class="row">
         <label>主题</label>
         <select id="fTheme">
-          <option value="light">浅色（参考片原色）</option>
-          <option value="dark">深色</option>
+          <option value="dark">深色（军用 HUD · 默认）</option>
+          <option value="light">浅色（暖白档案）</option>
         </select>
       </div>
       <div class="row">
@@ -218,12 +218,12 @@
     <div class="chk"><input type="checkbox" id="fSkip" checked><label for="fSkip">允许跳过（右上角 SKIP / Esc）</label></div>
 
     <div style="border-top:1px solid rgba(255,255,255,.1);padding-top:10px;display:flex;flex-direction:column;gap:10px">
-      <div class="chk"><input type="checkbox" id="fVoice" checked><label for="fVoice"><b>女声播报</b>（念每一行的英文）</label></div>
+      <div class="chk"><input type="checkbox" id="fVoice" checked><label for="fVoice"><b>语音播报</b>（BT 风格英文男声）</label></div>
       <div class="row2">
         <div class="row">
           <label>播报语言</label>
           <select id="fVoiceLang">
-            <option value="en" selected>英语（照参考片）</option>
+            <option value="en" selected>英语（BT 播报）</option>
             <option value="zh">中文</option>
             <option value="both">中英各念一遍</option>
           </select>
@@ -236,13 +236,13 @@
       <div class="row">
         <label>音色 <span id="voiceNote" style="color:#8b8c95"></span></label>
         <div style="display:flex;gap:8px">
-          <select id="fVoiceName" style="flex:1"><option value="">自动（优先女声）</option></select>
+          <select id="fVoiceName" style="flex:1"><option value="">自动（优先男声）</option></select>
           <button type="button" id="btnSample" style="flex:0 0 auto">试听</button>
         </div>
       </div>
       <div class="row">
-        <label>音调 <span id="fVPitchVal">0.85</span></label>
-        <input type="range" id="fVPitch" min="0" max="2" step="0.05" value="0.85">
+        <label>音调 <span id="fVPitchVal">0.8</span></label>
+        <input type="range" id="fVPitch" min="0" max="2" step="0.05" value="0.8">
       </div>
       <div class="row">
         <label>开口前留白 <span id="fVLeadVal">240 ms</span></label>
@@ -251,7 +251,7 @@
       <div class="chk"><input type="checkbox" id="fVoiceCue" checked><label for="fVoiceCue">播报前提示音（两声轻提示，AI 感的关键）</label></div>
       <div class="chk"><input type="checkbox" id="fSound" checked><label for="fSound">界面音效（咔哒 / 确认音 / 扫频 / 和声钟）</label></div>
       <div style="display:flex;gap:8px">
-        <button type="button" id="btnAiPreset" style="flex:1">↺ 套用「电影旁白」档（0.88 / 0.85 / 提示音 + 留白）</button>
+        <button type="button" id="btnAiPreset" style="flex:1">↺ 套用「BT 播报」档（0.88 / 0.8 / 提示音 + 留白）</button>
       </div>
     </div>
 
@@ -262,7 +262,7 @@
     </div>
 
     <div class="note">
-      六段序列：<b>需要访问许可</b> → 身份资料确认 → 接收访问需求 → 读取完毕 → 验证通过 → 欢迎 xxx 访问。
+      六段序列：<b>需要铁驭链接</b> → 神经握手同步 → 接收任务指令 → 系统自检开始 → 全系统正常 → 协议三·保护铁驭。
       第 1、2 步可交互（按钮 / Enter / 空格）。
     </div>
     <div class="note">离线预览不写入 DSH；正式插件的配置存在 <code>~/.dsh/dsh-startup.json</code>。</div>
@@ -289,7 +289,7 @@
       </div>
       <div class="dlgContent">
         <div class="__ss_root">
-          <div class="__ss_lead">启动界面：黑幕 DeepSeek 标识 → 过曝洗白 → 技术档案底板 → 交互式访问授权序列（需要访问许可 / 身份资料确认 / 接收访问需求 / 读取完毕 / 验证通过 / 欢迎 xxx 访问）。中文主字 + 英文等宽字幕，风格取自参考片。</div>
+          <div class="__ss_lead">启动序列：黑幕军徽 → 过曝洗白 → 军用档案底板 → BT-7274 链接自检（需要铁驭链接 / 神经握手同步 / 接收任务指令 / 系统自检开始 / 全系统正常 / 协议三·保护铁驭）。中文主字 + 英文等宽字幕，风格致敬《泰坦陨落 2》。</div>
 
           <div class="__ss_group">
             <div class="__ss_groupTitle">播放</div>
@@ -303,19 +303,19 @@
             </div>
             <div class="__ss_field"><label class="__ss_label">速度倍率</label>
               <div class="__ss_row"><input type="range" min="0.35" max="3" step="0.05" value="1" style="flex:1 1 240px" id="sSpeed"><span class="__ss_status" id="sSpeedVal">1.00×</span></div>
-              <div class="__ss_hint">0.35 慢放 · 1 原速 · 3 快放；参考片时长约 27 秒，默认整套约 16 秒。</div>
+              <div class="__ss_hint">0.35 慢放 · 1 原速 · 3 快放。</div>
             </div>
           </div>
 
           <div class="__ss_group">
             <div class="__ss_groupTitle">身份资料</div>
-            <div class="__ss_field"><label class="__ss_label">身份名称</label>
-              <input class="__ss_input" type="text" id="sIdentity" value="JOYCE MOORE" maxlength="64">
-              <div class="__ss_hint">终幕「欢迎 xxx 访问 / WELCOME, XXX」里的 xxx，也出现在第二步的身份卡上。</div>
+            <div class="__ss_field"><label class="__ss_label">铁驭名称</label>
+              <input class="__ss_input" type="text" id="sIdentity" value="JACK COOPER" maxlength="64">
+              <div class="__ss_hint">终幕「保护 xxx · PROTECT THE PILOT」里的 xxx，也出现在第二步的身份卡上。</div>
             </div>
             <div class="__ss_two">
-              <div class="__ss_field"><label class="__ss_label">身份编号</label><input class="__ss_input __ss_inputMono" type="text" id="sId" value="0087"><div class="__ss_hint">显示在身份卡上，建议用数字编号（如 0087）。</div></div>
-              <div class="__ss_field"><label class="__ss_label">权限等级</label><input class="__ss_input __ss_inputMono" type="text" id="sLevel" value="3"></div>
+              <div class="__ss_field"><label class="__ss_label">泰坦编号</label><input class="__ss_input __ss_inputMono" type="text" id="sId" value="BT-7274"><div class="__ss_hint">显示在第二步身份卡上，字母数字与连字符（如 BT-7274）。</div></div>
+              <div class="__ss_field"><label class="__ss_label">授权等级</label><input class="__ss_input __ss_inputMono" type="text" id="sLevel" value="PILOT"></div>
             </div>
           </div>
 
@@ -330,12 +330,12 @@
             <div class="__ss_groupTitle">视觉</div>
             <div class="__ss_field"><label class="__ss_label">主题</label>
               <select class="__ss_select" id="sTheme">
-                <option value="light" selected>浅色 · 暖白档案底板（参考片原色）</option>
-                <option value="dark">深色 · 暗底板</option>
+                <option value="dark" selected>深色 · 军用 HUD 底板（默认）</option>
+                <option value="light">浅色 · 暖白档案底板</option>
               </select>
             </div>
             <div class="__ss_two">
-              <div class="__ss_field"><label class="__ss_label">强调色 · 橙</label><div class="__ss_row"><input class="__ss_swatch" type="color" value="#ff7500" id="sAccent"><span class="__ss_status">#ff7500</span></div></div>
+              <div class="__ss_field"><label class="__ss_label">强调色 · 琥珀</label><div class="__ss_row"><input class="__ss_swatch" type="color" value="#ff9a1f" id="sAccent"><span class="__ss_status">#ff9a1f</span></div></div>
               <div class="__ss_field"><label class="__ss_label">故障色 · 蓝</label><div class="__ss_row"><input class="__ss_swatch" type="color" value="#2971b8" id="sGlitch"><span class="__ss_status">#2971b8</span></div></div>
             </div>
           </div>
@@ -343,19 +343,19 @@
           <div class="__ss_group">
             <div class="__ss_groupTitle">文案</div>
             <div class="__ss_two">
-              <div class="__ss_field"><label class="__ss_label">左上 · 主标题</label><input class="__ss_input" type="text" value="DEEPSEEK" id="sBrand1"></div>
-              <div class="__ss_field"><label class="__ss_label">左上 · 产品行</label><div class="__ss_row"><input class="__ss_input" type="text" value="HARNESS" id="sBrand3a" style="flex:1"><span class="__ss_status">+</span><input class="__ss_input" type="text" value="OS" id="sBrand3b" style="flex:0 0 60px"></div></div>
+              <div class="__ss_field"><label class="__ss_label">左上 · 主标题</label><input class="__ss_input" type="text" value="MILITIA" id="sBrand1"></div>
+              <div class="__ss_field"><label class="__ss_label">左上 · 产品行</label><div class="__ss_row"><input class="__ss_input" type="text" value="SRS" id="sBrand3a" style="flex:1"><span class="__ss_status">+</span><input class="__ss_input" type="text" value="MK.7" id="sBrand3b" style="flex:0 0 60px"></div></div>
             </div>
-            <div class="__ss_field"><label class="__ss_label">左上 · 副标题</label><input class="__ss_input" type="text" value="SYNTHESIZE INTELLIGENCE" maxlength="40" id="sBrand2"></div>
+            <div class="__ss_field"><label class="__ss_label">左上 · 副标题</label><input class="__ss_input" type="text" value="FREE FRONTIER" maxlength="40" id="sBrand2"></div>
             <div class="__ss_two">
-              <div class="__ss_field"><label class="__ss_label">黑幕 · 中文</label><input class="__ss_input" type="text" value="深度求索" id="sOrgZh"></div>
-              <div class="__ss_field"><label class="__ss_label">黑幕 · 英文</label><input class="__ss_input __ss_inputMono" type="text" value="DEEPSEEK" id="sOrgEn"></div>
+              <div class="__ss_field"><label class="__ss_label">黑幕 · 中文</label><input class="__ss_input" type="text" value="自由边境" id="sOrgZh"></div>
+              <div class="__ss_field"><label class="__ss_label">黑幕 · 英文</label><input class="__ss_input __ss_inputMono" type="text" value="MILITIA" id="sOrgEn"></div>
             </div>
             <div class="__ss_two">
-              <div class="__ss_field"><label class="__ss_label">黑幕 · 小字</label><input class="__ss_input __ss_inputMono" type="text" value="DEEPSEEK HARNESS" id="sOrgSub"></div>
-              <div class="__ss_field"><label class="__ss_label">终幕 · 黑框</label><input class="__ss_input" type="text" value="DEEPSEEK HARNESS" id="sWelcomeBox"></div>
+              <div class="__ss_field"><label class="__ss_label">黑幕 · 小字</label><input class="__ss_input __ss_inputMono" type="text" value="VANGUARD CLASS · TITAN OS" id="sOrgSub"></div>
+              <div class="__ss_field"><label class="__ss_label">终幕 · 黑框</label><input class="__ss_input" type="text" value="BT-7274" id="sWelcomeBox"></div>
             </div>
-            <div class="__ss_field"><label class="__ss_label">右下 · 页脚</label><input class="__ss_input __ss_inputMono" type="text" value="POWERED BY DEEPSEEK" id="sFooter"></div>
+            <div class="__ss_field"><label class="__ss_label">右下 · 页脚</label><input class="__ss_input __ss_inputMono" type="text" value="POWERED BY TITAN OS" id="sFooter"></div>
           </div>
 
           <div class="__ss_preview">
@@ -382,7 +382,7 @@
 
   function applyConfig() {
     var c = window.__DSH_STARTUP__;
-    c.identity = $('fIdentity').value || 'JOYCE MOORE';
+    c.identity = $('fIdentity').value || 'JACK COOPER';
     c.identityId = $('fId').value || '';
     c.accessLevel = $('fLevel').value || '3';
     c.theme = $('fTheme').value;
@@ -419,7 +419,7 @@
     });
   });
 
-  /* ── 音色列表（女声排前面）+ 试听 ──────────────────────────────────── */
+  /* ── 音色列表（英文台词男声排前面）+ 试听 ──────────────────────────── */
   var NATURAL_HINTS = ['natural','neural','online','premium','enhanced','siri','google'];
   var FEMALE_HINTS = ['aria','jenny','michelle','emma','ava','libby','sonia','maisie',
     'zira','samantha','karen','moira','tessa','victoria','serena','allison','susan','fiona','hazel','female','woman',
@@ -432,8 +432,8 @@
       if (!ss || !ss.getVoices) return [];
       var list = (ss.getVoices() || []).map(function (v, i) {
         var n = String(v.name || '').toLowerCase();
-        var sc = (hits(n, NATURAL_HINTS) ? 60 : 0) + (hits(n, FEMALE_HINTS) ? 40 : 0)
-          - (hits(n, MALE_HINTS) ? 45 : 0) + (String(v.lang || '').indexOf('en') === 0 ? 25 : 0);
+        var sc = (hits(n, NATURAL_HINTS) ? 60 : 0) + (hits(n, MALE_HINTS) ? 40 : 0)
+          - (hits(n, FEMALE_HINTS) ? 45 : 0) + (String(v.lang || '').indexOf('en') === 0 ? 25 : 0);
         return { v: v, sc: sc, i: i };
       });
       list.sort(function (a, b) { return a.sc !== b.sc ? b.sc - a.sc : a.i - b.i; });
@@ -443,12 +443,12 @@
   function fillVoices() {
     var sel = document.getElementById('fVoiceName'), cur = sel.value;
     var list = readVoices();
-    sel.innerHTML = '<option value="">自动（优先女声）</option>';
+    sel.innerHTML = '<option value="">自动（优先男声）</option>';
     list.forEach(function (v) {
       var o = document.createElement('option');
       o.value = v.name;
       var ln = String(v.name || '').toLowerCase();
-      o.textContent = (hits(ln, NATURAL_HINTS) ? '★ ' : (hits(ln, FEMALE_HINTS) ? '♀ ' : '')) + v.name + ' · ' + (v.lang || '');
+      o.textContent = (hits(ln, NATURAL_HINTS) ? '★ ' : (hits(ln, MALE_HINTS) ? '♂ ' : (hits(ln, FEMALE_HINTS) ? '♀ ' : ''))) + v.name + ' · ' + (v.lang || '');
       sel.appendChild(o);
     });
     if (cur) sel.value = cur;
@@ -469,7 +469,7 @@
       if (!ss) return;
       ss.cancel();
       var lang = document.getElementById('fVoiceLang').value;
-      var u = new SpeechSynthesisUtterance(lang === 'zh' ? '需要访问许可，验证通过。' : 'Access permission required.');
+      var u = new SpeechSynthesisUtterance(lang === 'zh' ? '需要铁驭链接，等待确认。' : 'Pilot link required.');
       var name = document.getElementById('fVoiceName').value;
       var list = readVoices();
       for (var i = 0; i < list.length; i++) { if (list[i].name === name) { u.voice = list[i]; u.lang = list[i].lang; } }
@@ -486,12 +486,12 @@
   document.getElementById('btnAiPreset').addEventListener('click', function (e) {
     e.stopPropagation();
     document.getElementById('fVRate').value = 0.88;
-    document.getElementById('fVPitch').value = 0.85;
+    document.getElementById('fVPitch').value = 0.8;
     document.getElementById('fVoiceName').value = '';
     document.getElementById('fVoiceCue').checked = true;
     document.getElementById('fVLead').value = 240;
     document.getElementById('fVRateVal').textContent = '0.88×';
-    document.getElementById('fVPitchVal').textContent = '0.85';
+    document.getElementById('fVPitchVal').textContent = '0.8';
     document.getElementById('fVLeadVal').textContent = '240 ms';
     speakSample();
   });
@@ -543,15 +543,15 @@
   });
   $('sReload').addEventListener('click', function () { $('sNotice').textContent = '已放弃修改。'; });
   $('sReset').addEventListener('click', function () {
-    $('sIdentity').value = 'JOYCE MOORE'; $('sId').value = '0087';
-    $('sLevel').value = '3'; $('sTheme').value = 'light';
+    $('sIdentity').value = 'JACK COOPER'; $('sId').value = 'BT-7274';
+    $('sLevel').value = 'PILOT'; $('sTheme').value = 'dark';
     $('sSpeed').value = 1; $('sSpeedVal').textContent = '1.00×';
     $('sInteract').checked = true; $('sSkip').checked = true; $('sSound').checked = false;
-    $('sBrand1').value = 'DEEPSEEK'; $('sBrand2').value = 'SYNTHESIZE INTELLIGENCE';
-    $('sBrand3a').value = 'HARNESS'; $('sBrand3b').value = 'OS';
-    $('sOrgZh').value = '深度求索'; $('sOrgEn').value = 'DEEPSEEK';
-    $('sOrgSub').value = 'DEEPSEEK HARNESS'; $('sWelcomeBox').value = 'DEEPSEEK HARNESS';
-    $('sFooter').value = 'POWERED BY DEEPSEEK';
+    $('sBrand1').value = 'MILITIA'; $('sBrand2').value = 'FREE FRONTIER';
+    $('sBrand3a').value = 'SRS'; $('sBrand3b').value = 'MK.7';
+    $('sOrgZh').value = '自由边境'; $('sOrgEn').value = 'MILITIA';
+    $('sOrgSub').value = 'VANGUARD CLASS · TITAN OS'; $('sWelcomeBox').value = 'BT-7274';
+    $('sFooter').value = 'POWERED BY TITAN OS';
     $('sNotice').textContent = '已恢复默认。';
   });
 

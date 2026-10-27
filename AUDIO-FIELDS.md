@@ -1,37 +1,58 @@
 # 需要音频的字段清单
 
 本文件列出启动动画里**所有会出声的槽位**，以及每个槽位当前用的是哪份素材。
-数值与文件名直接从 `lib/splash.js` 抓取。
+数值与文件名直接从 `lib/splash.js` 抓取。对应 2.1（泰坦陨落 2 · BT 版）。
 
 ---
 
-## 一、语音台词 —— 5 个槽位，全部用真声素材（终幕不出人声）
+## 一、语音台词 —— BT 原声素材优先，TTS 自动回落
 
-素材来自你提供的 `52xo4-igqdo-001.aac`，一一对应如下：
+6 个台词槽位，每个都挂着一份可选的 BT 真声素材（`lib/assets/line-N.mp3`）。
+缺哪段就自动回落到系统 TTS 男声念 `say` 台词，一个不放也照常播，只是没有原声。
 
-| 槽位 | 中文主字 | 英文副标题 | 素材文件 | 源素材 | 素材时长 | 出声时机 |
-|---|---|---|---|---|---|---|
-| `line-1` | 需要访问许可 | `ACCESS PERMISSION REQUIRED` | `lib/assets/line-1.mp3` | V1 (7.40–9.36s) | **1.96s** | 洗白后第一步，与文字渐显同时 |
-| `line-2` | 身份资料确认 | `IDENTITY VERIFICATION` | `lib/assets/line-2.mp3` | V2 (11.29–12.45s) | **1.16s** | 第二步（身份卡 + 等确认） |
-| `line-3` | 接收访问需求 | `ACCESS REQUEST RECEIVED` | `lib/assets/line-3.mp3` | V4 (14.76–15.83s) | **1.07s** | 第三步（鲸鱼标识一笔画成） |
-| `line-4` | 开始读取权限 | `PERMISSION READ STARTED` | `lib/assets/line-4.mp3` | V5 (17.11–18.29s) | **1.18s** | 第四步（十六进制瀑布） |
-| `line-5` | 读取完毕 · 核验通过 | `READ COMPLETE · VERIFIED` | `lib/assets/line-5.mp3` | V6 (19.71–21.41s) | **1.70s** | 第五步（环形准星扫描） |
+**2.1.1 起已内置 5 句**，取自 DBM-VPBT7274 语音包（Bert-VITS2 用 BT-7274 声线
+训练的 AI 合成语音，作者 一个小莽夫）：
 
-**V3（13.04–14.09s）是用户名字独白，按你的要求不使用。**
+| 槽位 | 画面步骤 | 已内置素材 | 实际台词（DBM 词表原文） | TTS 回落台词 |
+|---|---|---|---|---|
+| `line-1` | 需要铁驭链接 | `readyrescue` | "Prepare rescue"（准备救援） | `Pilot link required.` |
+| `line-2` | 神经握手同步 | `positive` | "positive"（收到） | `Initiating neural handshake.` |
+| `line-3` | 接收任务指令 | `com_go` | "GO GO GO" | `Mission directive received.` |
+| `line-4` | 系统自检开始 | `checkhp` | "health warning!"（健康检查告警） | `Systems check initiated.` |
+| `line-5` | 全系统正常 | `safenow` | "safe now"（已安全） | `All systems nominal.` |
+| `line-6` | 协议三 · 揭幕 | `defensive` | **"Defensive"**（防御姿态） | `Protocol three. Protect the pilot.` |
 
-### 素材取不到时
+> 台词以 DBM 官方 `!VoiceText.txt` 词表为准（Bert-VITS2 就是按这份词表生成的）。
 
-`voiceSource = 'asset'`（默认）时优先用素材；**素材缺失或解码失败会自动回落到 TTS**
-（`say` 字段就是回落用的文本）。设置页可强制 `tts`。
+> 终幕素材**刻意选了 WebAudio 通道**：TTS 在线音色偶发合成失败（onerror）/
+> 延迟，会把协议三那句话吞掉或掐断；素材播放走 WebAudio，确定性强。
+> 想让终幕念完整原话 "Protocol three. Protect the pilot."：删掉
+> `lib/assets/line-6.mp3`（或语音来源切 `系统 TTS 男声`）；
+> 想用自己的录音：存成 `lib/assets/line-6.mp3` 覆盖即可。
 
-### 终幕不出人声
+### 换素材 / 补素材
 
-按你的要求，**终幕「欢迎 `<身份名称>` 访问」只有画面与和声钟，不播人声**。
-`finale()` 里调用 `voice.stop()` 收尾，源码中已无 `voice.tts(` 调用
-（`test/smoke-splash.mjs` 第 8 节有回归断言钉住这条）。
+1. 完整语音包备份在仓库根目录 `BT语音素材包/DBM-VPBT7274.zip`（339 条 ogg 切片，
+   实为 WAV 数据）；zip 已从 `lib/assets/` 挪走，不会被打进发布包
+2. 挑中意的切片覆盖 `lib/assets/line-1 … 6.mp3`（无需转码：内容是 WAV，
+   `decodeAudioData` 按内容嗅探解码，Chromium / Firefox / Safari 通吃）
+3. 重启 dsh web 生效
 
-将来的备选：如果想把终幕也配上人声，可以
-① 让名字固定死 → 做成素材；② 补一条「欢迎访问」的通用素材（不含名字）。
+### 导入方法
+
+1. 找到 BT 语音素材（自己游戏内录制 / 已有音频截取）
+2. 按上表存成 `lib/assets/line-1.mp3` … `line-6.mp3`（mp3 格式，任意码率均可）
+3. 重启 dsh web（或桌面端）——**放几段用几段，其余槽位自动走 TTS**
+4. 想全部用系统合成音：设置页 →「启动动画」→ 语音来源 → `系统 TTS 男声`
+
+### 行为细节
+
+- 素材在**加载时就预取**（fetch + decodeAudioData 不需要用户手势），
+  第一步就能出原声，不用等第一次点击
+- 每步停留时长 = max(视觉基准, 实际播报时长 + 240ms 收尾)——**原声没播完
+  不会推进**，你点得快也不会把语音掐断
+- 播放有 401 信任栅栏，素材只能被登录后的页面取用
+- `voiceSource = 'tts'` 时完全跳过素材（不发起请求）
 
 ---
 
@@ -43,79 +64,43 @@
 | 2 | `tick` | 文字逐字渐显 | `lib/assets/sfx-tick.mp3` | ✅ 真素材 |
 | 3 | `step` | 每个阶段推进 | 同上 | ✅ 真素材 |
 | 4 | `confirm` | 点按钮 / 按 Enter 确认 | 同上 | ✅ 真素材 |
-| 5 | `tickRun` | 十六进制瀑布开始滚动 | `lib/assets/sfx-ticks-run.mp3` | ✅ 真素材 |
-| 6 | `sweep` | 黑幕 → 暖白底板的洗白过场 | 合成（带通噪声扫频） | 合成 |
-| 7 | `rise` | 黑幕上 DeepSeek 标识出现 | 合成（220→990 Hz 上行） | 合成 |
+| 5 | `tickRun` | 自检流水开始滚动 | `lib/assets/sfx-ticks-run.mp3` | ✅ 真素材 |
+| 6 | `sweep` | 黑幕 → 军用底板的洗白过场 | 合成（带通噪声扫频） | 合成 |
+| 7 | `rise` | 黑幕上军徽出现 | 合成（220→990 Hz 上行） | 合成 |
 | 8 | `chime` | 终幕揭幕 | 合成（三音和声钟） | 合成 |
 
 `tick` / `step` / `confirm` 目前**共用同一个「哒」**（音量不同）。
-如果想让它们各用不同音效，补素材即可。
-
-### 为什么 4 个还是合成
-
-你给的音频里 **0–6.90s 是纯静音**：
-
-- `rise` 对应原片约 3.9–5.5s → **原音频那里没有声音**
-- `sweep` 对应原片约 6.2–6.7s → **同上**
-- `chime` 对应 22.62–27.40s，但那是**配乐**不是音效
+素材缺失或 `音效来源 = 现场合成` 时，哒声回落到 WebAudio 现场合成。
 
 ---
 
-## 三、素材清单
+## 三、素材目录现状
 
 ```
 lib/assets/
-├─ line-1.mp3          40.3 KB   V1  需要访问许可
-├─ line-2.mp3          24.5 KB   V2  身份资料确认
-├─ line-3.mp3          23.0 KB   V4  接收访问需求
-├─ line-4.mp3          25.0 KB   V5  开始读取权限
-├─ line-5.mp3          35.2 KB   V6  读取完毕 · 核验通过
-├─ sfx-tick.mp3         2.1 KB   单声「哒」（20ms，质心 7.5kHz）
-└─ sfx-ticks-run.mp3   10.2 KB   整串 10 个「哒」，每 45ms 一个
+├─ sfx-tick.mp3         2.1 KB   界面「哒」声
+├─ sfx-ticks-run.mp3   10.5 KB   自检流水连续哒声
+├─ (line-1.mp3)                  ← 待放入：BT 建立链接原话
+├─ (line-2.mp3)                  ← 待放入：BT 神经握手原话
+├─ (line-3.mp3)                  ← 待放入：BT 接收指令原话
+├─ (line-4.mp3)                  ← 待放入：BT 系统自检原话
+├─ (line-5.mp3)                  ← 待放入：BT "All systems nominal"
+└─ (line-6.mp3)                  ← 待放入：BT 协议三原话
 ```
 
-Host 经 `/dsh-startup/asset/<文件名>` 只读下发（正则白名单 + 防目录穿越）。
-6 段真声素材的 40–120Hz 能量都在 −25 ~ −34 dB（片尾配乐是 −1.3 dB），
-**素材本身干净，没有配乐底**。
+`/dsh-startup/asset/` 路由服务整个目录（白名单 + 401 栅栏），放入即生效。
 
 ---
 
-## 四、时长怎么定
+## 四、设置项对应
 
-**不再写死。** 每一步的停留时间 = `max(视觉基准, 实际音频时长 + 240ms 收尾)`：
-
-```js
-var spoke = voice.line(step.say, step.zh, step.audio)   // Promise<这一句实际播了多久>
-function holdFor(spoken) {
-  var target = Math.max(ms(step.hold), (spoken || 0) + ms(240))
-  return wait(Math.max(0, target - (spoken || 0)))
-}
-```
-
-素材播多长，动画就等多久；**用户点得快也不掐断语音**。
-只有「跳过 / 揭幕」才真的 `cancel()`。
-
-按素材时长，五步的语音段落约：
-`1.96s → 1.16s → 1.07s → 1.18s → 1.70s`（另加每次 240ms 的开头留白）。
-
----
-
-## 五、有字但故意不配音的字段
-
-`en`（中央大字）· `log` / `logEn`（底部日志）· `btnZh` / `btnEn`（按钮）· `badge`（阶段计数）·
-`brand1/2/3`、`orgZh/orgEn/orgSub`、`welcomeBox`、`footer`（品牌与页脚）
-
----
-
-## 六、相关设置项
-
-| 设置项 | 作用 |
+| 设置项 | 槽位 |
 |---|---|
-| `voice` | 语音播报总开关 |
-| `voiceSource` | `asset`=优先真声素材 / `tts`=全 TTS |
-| `voiceLang` | `en` / `zh` / `both`（只影响 TTS 回落时念什么） |
-| `voiceName` / `voiceRate` / `voicePitch` / `voiceVolume` | TTS 音色与语调 |
-| `voiceCue` | 念台词前的提示音开关 |
-| `voiceLead` | 提示音之后留多久再开口（默认 240ms） |
-| `sound` / `soundVolume` | 界面音效总开关与音量（**不连坐语音素材**） |
-| `sfx` | 音效来源：`audio`=真素材 / `synth`=全合成 |
+| 语音播报 | 一节全部台词槽位 |
+| **语音来源** | `asset` = BT 真声优先 / `tts` = 全 TTS |
+| 播报语言 | 英文 / 中文 / 中英各念一遍（素材只挂英文轨；中文播报走 TTS） |
+| 音色 / 语速 / 音调 / 音量 | TTS 合成参数 |
+| 播报前提示音 | `cue` |
+| 开口前留白 | `cue` 与台词之间的空白 |
+| 界面音效 / 音效音量 | 二节全部音效槽位（不影响台词） |
+| 音效来源 | `audio` = 真素材 / `synth` = 现场合成 |

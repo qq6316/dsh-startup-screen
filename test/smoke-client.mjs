@@ -55,14 +55,14 @@ const windowStub = {
 
 /* ── fetch stub ──────────────────────────────────────────────────────────── */
 const CFG = {
-  enabled: true, mode: 'session', theme: 'light', speed: 1,
+  enabled: true, mode: 'session', theme: 'dark', speed: 1,
   requireInteraction: true, allowSkip: true, sound: true, soundVolume: 0.5,
   voice: true, voiceLang: 'en', voiceName: '', voiceRate: 1, voicePitch: 1, voiceVolume: 0.9,
-  identity: 'JOYCE MOORE', identityId: '0087', accessLevel: '3',
-  brand1: 'DEEPSEEK', brand2: 'SYNTHESIZE INTELLIGENCE', brand3a: 'HARNESS', brand3b: 'OS',
-  orgZh: '深度求索', orgEn: 'DEEPSEEK', orgSub: 'DEEPSEEK HARNESS',
-  welcomeBox: 'DEEPSEEK HARNESS', footer: 'POWERED BY DEEPSEEK',
-  accent: '#ff7500', glitchA: '#ff3b30', glitchB: '#2971b8',
+  identity: 'JACK COOPER', identityId: 'BT-7274', accessLevel: 'PILOT',
+  brand1: 'MILITIA', brand2: 'FREE FRONTIER', brand3a: 'SRS', brand3b: 'MK.7',
+  orgZh: '自由边境', orgEn: 'MILITIA', orgSub: 'VANGUARD CLASS · TITAN OS',
+  welcomeBox: 'BT-7274', footer: 'POWERED BY TITAN OS',
+  accent: '#ff9a1f', glitchA: '#ff3b30', glitchB: '#2971b8',
 }
 let versionInResponse = '9.9.9'
 const requests = []
@@ -151,8 +151,8 @@ await flush(); await flush()
 tree = renderPanel()
 check('GET /dsh-startup/config 被调用', requests.some((r) => r.url === '/dsh-startup/config' && (!r.init || !r.init.method)), requests.map((r) => (r.init && r.init.method) || 'GET').join(','))
 const texts = walk(tree).filter((n) => typeof n.props.children === 'string').map((n) => n.props.children)
-check('渲染出「身份名称」字段', texts.includes('身份名称'), texts.slice(0, 12).join('/'))
-check('渲染出「身份编号」字段', texts.includes('身份编号'))
+check('渲染出「铁驭名称」字段', texts.includes('铁驭名称'), texts.slice(0, 12).join('/'))
+check('渲染出「泰坦编号」字段', texts.includes('泰坦编号'))
 
 /* 面板顶部：原来的大段说明已移除，改成版本号 */
 const versionNode = find(tree, (n) => n.props && n.props.className === '__ss_version')
@@ -160,11 +160,11 @@ check('顶部渲染出版本号节点 __ss_version', !!versionNode, versionNode 
 check('版本号取自 /dsh-startup/config 返回的 version', versionNode && versionNode.props.children === '版本 v9.9.9', versionNode && String(versionNode.props.children))
 check('已删除原来那段「启动界面：黑幕…」说明', !JSON.stringify(tree).includes('启动界面：'), '')
 check('已删除 __ss_lead 样式类', !JSON.stringify(tree).includes('__ss_lead'), '')
-check('渲染出「权限等级」字段', texts.includes('权限等级'))
-const idInput = find(tree, (n) => n.type === 'input' && n.props.type === 'text' && n.props.value === 'JOYCE MOORE')
-check('身份名称输入框回填了当前配置', !!idInput, idInput && idInput.props.value)
+check('渲染出「授权等级」字段', texts.includes('授权等级'))
+const idInput = find(tree, (n) => n.type === 'input' && n.props.type === 'text' && n.props.value === 'JACK COOPER')
+check('铁驭名称输入框回填了当前配置', !!idInput, idInput && idInput.props.value)
 check('渲染出「启动动画」开关', texts.includes('启用启动动画'))
-check('渲染出「女声播报」开关', texts.includes('女声播报（念每一行的英文）'))
+check('渲染出「语音播报」开关', texts.includes('语音播报（BT 风格英文男声）'))
 check('渲染出「播报语言」字段', texts.includes('播报语言'))
 check('渲染出「界面音效」开关', texts.includes('界面音效'))
 check('渲染出音色选择（无 speechSynthesis 时给出提示）', texts.includes('音色'))

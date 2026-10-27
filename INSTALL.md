@@ -3,7 +3,7 @@
 ## 一、直接安装（推荐）
 
 ```bash
-dsh plugin --profile web add ./dsh-startup-screen-1.1.2.tgz
+dsh plugin --profile web add ./dsh-startup-screen-2.1.0.tgz
 ```
 
 Windows 上双击 `安装.cmd` 也一样。
@@ -33,6 +33,12 @@ DSH 靠 **`dsh.profile.bundles`** 这个层堆栈决定加载哪些插件，而
 `ctx.webServer.register()` 对同一路径重复注册会报错。
 
 `安装.cmd` 会自动检测并提示。
+
+### 从 1.x 升级
+
+2.0 起出厂默认值整段换成泰坦陨落 2 风格，且**语音来源（真声素材 / TTS）这一
+选项已移除**——台词全部由系统 TTS 播报。老配置文件里遗留的 `voiceSource` 字段
+会被自动忽略，不需要手工清理；想拿到新默认文案，在设置页点一次「恢复默认」即可。
 
 ---
 
@@ -64,8 +70,8 @@ DSH 靠 **`dsh.profile.bundles`** 这个层堆栈决定加载哪些插件，而
 - `/dsh-startup/splash.js` 返回 **401** → 路由已注册（401 是插件自己的信任栅栏，正常）
 - 返回 **404** → 没装成功，或没重启
 
-打开页面后应该看到：黑幕 → DeepSeek 标识 → 过曝洗白 → 暖白底板 →
-五步授权序列 → 揭幕。
+打开页面后应该看到：黑幕军徽 → 过曝洗白 → 军用底板 →
+五步铁驭链接序列 → 协议三揭幕。
 
 ---
 
@@ -85,11 +91,11 @@ dsh plugin --profile web remove dsh-startup-screen
 
 | 分组 | 可调 |
 |---|---|
-| 播放 | 显示模式（每次会话 / 总是）、速度、是否可跳过 |
-| 身份资料 | 身份名称（默认 `JOYCE MOORE`）、编号、权限等级 |
+| 播放 | 显示模式（每次会话 / 总是 / 每天）、主题、速度、是否可跳过 |
+| 身份资料 | 铁驭名称（默认 `JACK COOPER`）、泰坦编号（`BT-7274`）、授权等级（`PILOT`） |
 | 交互 | 是否要求点击按钮确认 |
-| 语音与音效 | 语音开关、**语音来源（真声素材 / 系统 TTS）**、音色、语速、音调、音量、播报前提示音、开口前留白；界面音效开关与音量 |
-| 视觉 | 主题、动效强度 |
+| 语音与音效 | 语音开关、**语音来源（BT 真声素材 / 系统 TTS 男声）**、播报语言、音色、语速、音调、音量、播报前提示音、开口前留白；界面音效开关与音量 |
+| 视觉 | 主题、强调色、故障色 |
 | 文案 | 中文主字 / 英文副标题 / 日志行 / 按钮文字 |
 
 配置落盘在 `$DSH_HOME/dsh-startup.json`（默认 `~/.dsh/dsh-startup.json`）。
@@ -103,8 +109,8 @@ dsh plugin --profile web remove dsh-startup-screen
 | Node | **>= 20** |
 | 平台 | DSH **web** profile（`dsh.client.platform = "web"`） |
 | 运行时依赖 | **零**（`dependencies` / `peerDependencies` 都是空的） |
-| 语音 | 浏览器 Web Speech API；Edge 里能挑到 `... Online (Natural)` 神经网络音色 |
-| 真声素材 | 已内置 `lib/assets/`；**取不到会自动回落 TTS**，不影响启动 |
+| 语音 | BT 真声素材优先（`lib/assets/line-1…6.mp3` 自行放入）；**缺素材自动回落系统 TTS 英文男声**（Web Speech API，Edge 里能挑到 `... Online (Natural)` 神经网络男声） |
+| 界面音效素材 | 已内置 `lib/assets/`；**取不到会自动回落合成音**，不影响启动 |
 
 ---
 
@@ -115,12 +121,13 @@ lib/index.js          Host 半：路由 + index.html 注入
 lib/splash.js         启动动画运行时
 lib/splash.css        全部样式
 lib/client.js         设置面板（浏览器半）
-lib/assets/           真声台词 x5 + 终幕欢迎语 + 界面音效 x2
+lib/assets/           界面音效 x2（哒声 / 连续哒声）+ BT 台词槽位 line-1…6.mp3（可选，自行放入）
 cordis.patch.yml      bundle 层声明
 preview/index.html    离线预览页
-test/                 三套冒烟测试（146 项断言）
+test/                 四套冒烟测试（233 项断言）
 README.md             完整文档
-AUDIO-FIELDS.md       需要音频的字段清单
+AUDIO-FIELDS.md       语音 / 音效槽位清单（含 BT 素材导入说明）
+DESKTOP.md            桌面端适配说明
 ```
 
 跑测试：`npm test`
