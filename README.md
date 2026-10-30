@@ -2,20 +2,20 @@
 
 DeepSeek Harness 的启动界面与启动动画插件（泰坦陨落 2 · Hammond Robotics / HARNESS 版）。
 
-黑幕军徽 → 过曝洗白 → 军工底板（背景图 + 左栏信息列）→ 五步交互式铁驭链接 → 协议三揭幕。
+黑幕军徽 → 过曝洗白 → 军工底板（背景图 + 居中主舞台）→ 五步交互式铁驭链接 → 协议三揭幕。
 
 ---
 
 ## 功能
 
 **开机序列**　冷启动时播一段完整的开机动画，六幕连贯：军徽番号 → 过曝洗白 →
-军工底板 → 五步铁驭链接 → 协议三揭幕。2.2 起底板照 Hammond Robotics 概念图
-重制：左栏信息列（TITANFALL|2 徽标 → Hammond 圆徽 → **/ HARNESS** 主标题 →
-状态行 → **开机自检清单** → **百分比进度条** → 标语），右上角机构行，整屏
-背景图压阵。
+军工底板 → 五步铁驭链接 → 协议三揭幕。2.3 泰坦 HUD 升级版式：**居中主舞台**
+（**/ HARNESS** 主标题 → 状态行 → **开机自检清单** → **百分比进度条** → 标语），
+顶栏三分（左上品牌块 + 圆徽 · 居中产品行与实时时钟 · 右上机构行），底部三分
+（页脚 · 字幕 · 身份读数），整屏背景图压阵。
 
 **背景图**　深色主题加载 `lib/assets/bg.jpg`（出厂自带一张铁驭与泰坦眺望
-星球的图，可以换成任意自己的图，支持 png/webp），上面叠左栏衬底与 CRT
+星球的图，可以换成任意自己的图，支持 png/webp），上面叠中央主舞台衬底与 CRT
 扫描线；**缺图或关掉「背景图」开关时自动回落纯色军工底板**，版式不变。
 
 **可交互，不是播片**　第一、二步要你点按钮或按 Enter 才会继续（可以关掉）。
@@ -56,7 +56,7 @@ FINALIZING BOOT SEQUENCE，进度条与百分比同步走到 100%。
 ## 安装
 
 ```bash
-dsh plugin --profile web add ./dsh-startup-screen-2.2.0.tgz
+dsh plugin --profile web add ./dsh-startup-screen-2.3.0.tgz
 ```
 
 Windows 上也可以解压 release 压缩包后**双击「安装.cmd」**，脚本会自动完成同样的操作。
@@ -138,7 +138,7 @@ dsh plugin --profile web remove dsh-startup-screen
 | 选项 | 默认 | 作用 |
 |---|---|---|
 | 左上 · 主字 / 编号 | `TITANFALL` / `2` | 左上角徽标「TITANFALL \| 2」 |
-| 圆徽 · 字母/名称/副名 | `H` / `Hammond` / `ROBOTICS` | 徽标下方的圆徽块 |
+| 圆徽 · 字母/名称/副名 | `H` / `Hammond` / `ROBOTICS` | 徽标下方的圆徽块；字母填长词会自动缩小并居中在圆环内 |
 | 主标题 / 副行 | `HARNESS` / `IMC / HAMMOND PILOT ASSIST SYSTEM` | 左栏大标题两行 |
 | 右上 · 机构行 / 系统行 | `IMC / HAMMOND ROBOTICS` / `ADVANCED PILOT SYSTEMS` | 右上角两行小字 |
 | 标语 | `BETTER HUMANS. STRONGER TOGETHER.` | 进度条下方的一行小字 |

@@ -2,11 +2,14 @@
  * dsh-startup-screen — 启动界面 / 启动动画样式
  * ----------------------------------------------------------------------------
  * 2.0 起照《泰坦陨落 2》（Titanfall 2）BT-7274 的开机语汇重排；
- * 2.2 起版式照 Hammond Robotics / HARNESS 概念图重制：
- *   黑色序幕 → 过曝洗白 → 军工底板（背景图 + 左栏信息列 + CRT 扫描线）→
- *   左栏信息列：TITANFALL|2 徽标 → Hammond 圆徽 → / HARNESS 主标题 →
- *   状态行（中文主字 + 英文等宽字幕）→ 开机自检清单 → 进度条 + 百分比 → 标语；
- *   右上角机构行，PROTOCOL 3 终幕版式 + 色散故障。
+ * 2.3 升级版式（泰坦 HUD 升级版）：从 2.2 的"左下信息列"改成"居中主舞台"：
+ *   黑色序幕 → 过曝洗白 → 军工底板（背景图 + CRT 扫描线）→
+ *   顶栏三分：左上品牌块（主字|编号 + 圆徽）· 居中产品行 + 实时时钟 + 六格阶段柱 ·
+ *   右上机构行；
+ *   中央主舞台：/ HARNESS 主标题 → 机构副行 → 状态行（中文主字 + 英文等宽字幕）→
+ *   分隔线 → 开机自检清单（居中窄栏）→ 百分比进度条 → 标语 → 交互区；
+ *   底部三分：左下页脚 · 中央字幕 · 右下身份读数 / 声纹 / 阶段计数；
+ *   PROTOCOL 3 终幕版式 + 色散故障。
  *
  * 全部字体都取系统自带字体，零网络依赖：
  *   --dsu-din   Bahnschrift（Windows 10+ 自带 DIN 1451 风格 —— 正是泰坦陨落
@@ -15,11 +18,20 @@
  *   --dsu-zh    微软雅黑（中文主字 / 小字幕）
  * ========================================================================== */
 
+/* 结构性归零：box-sizing 统一用 box-border（类里没人想改它，ID 特异性无所谓） */
 #dsh-startup-root,
 #dsh-startup-root *,
 #dsh-startup-root *::before,
 #dsh-startup-root *::after {
   box-sizing: border-box;
+}
+
+/* margin / padding 的归零必须用 :where() 降到"零特异性"：
+   2.2 起这里写的是 `#dsh-startup-root *`（ID 特异性 1,0,0），把每一个
+   .dsu-* 类里的 margin / padding（标语间距、状态区间距、按钮内边距……）
+   全部压成 0 —— 版式微调一直没生效，间距全靠 flex gap 和行盒撑着。
+   用 :where() 后归零仍覆盖 UA 默认值，但类选择器可以正常覆盖它。 */
+:where(#dsh-startup-root, #dsh-startup-root *, #dsh-startup-root *::before, #dsh-startup-root *::after) {
   margin: 0;
   padding: 0;
 }
@@ -145,20 +157,20 @@
   opacity: 0;
 }
 
-/* 深色主题：背景图之上叠左栏信息列衬底 + 上下压暗，保证白字可读 */
+/* 深色主题：背景图之上叠"中央主舞台"衬底 + 上下压暗 —— 舞台四周淡、中心略沉，
+   白字落在居中轴线上一眼可读（2.3 居中版式；2.2 的左栏纵衬底已废） */
 .dsu-dark .dsu-plate {
   background:
-    linear-gradient(90deg,
-      rgba(4, 9, 17, 0.9) 0%,
-      rgba(4, 9, 17, 0.78) 26%,
-      rgba(5, 11, 20, 0.4) 44%,
-      rgba(5, 11, 20, 0.04) 62%,
-      rgba(4, 9, 16, 0.18) 100%),
     linear-gradient(180deg,
-      rgba(3, 7, 14, 0.5) 0%,
-      rgba(3, 7, 14, 0) 20%,
+      rgba(3, 7, 14, 0.55) 0%,
+      rgba(3, 7, 14, 0.08) 22%,
+      rgba(3, 7, 14, 0) 34%,
       rgba(3, 7, 14, 0) 74%,
-      rgba(2, 5, 10, 0.55) 100%);
+      rgba(2, 5, 10, 0.58) 100%),
+    radial-gradient(96% 72% at 50% 42%,
+      rgba(5, 11, 20, 0.5) 0%,
+      rgba(5, 11, 20, 0.16) 58%,
+      rgba(4, 9, 16, 0.04) 100%);
 }
 
 /* 没有背景图时：纯色军工底板兜底（同一版式，不空） */
@@ -183,6 +195,26 @@
 }
 .dsu-dark .dsu-wm {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0));
+}
+
+/* 深色主题：背景图有亮天空，清单 / 标语 / 顶栏小字压不住 --dsu-muted，
+   统一提亮到 ink-soft，并补一层暗描边阴影，保证小字在云层上也读得清 */
+.dsu-dark .dsu-check,
+.dsu-dark .dsu-tagline,
+.dsu-dark .dsu-meta,
+.dsu-dark .dsu-stepcount,
+.dsu-dark .dsu-sub-en2,
+.dsu-dark .dsu-foot-v {
+  color: var(--dsu-ink-soft);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
+}
+/* 状态字幕是橙色强调色，落在亮云上最容易糊：加深阴影把它从背景里拉出来 */
+.dsu-dark .dsu-sub-en {
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 12px rgba(77, 159, 232, 0.3);
+}
+.dsu-dark .dsu-headline,
+.dsu-dark .dsu-headline-sub {
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6);
 }
 
 /* 细颗粒噪点，让大色块不"塑料" */
@@ -376,18 +408,31 @@
   margin-top: 20px;
 }
 .dsu-roundel {
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 46px;
   height: 46px;
   border: 2px solid var(--dsu-ink);
   border-radius: 50%;
+  overflow: hidden;
   box-shadow: inset 0 0 0 3px transparent, inset 0 0 0 4.5px var(--dsu-hair-soft);
   font-family: var(--dsu-din);
   font-size: 23px;
   font-weight: 800;
   letter-spacing: 0;
   text-indent: 0;
+}
+/* 圆徽字母单独成节点：width:max-content 让盒子就等于文字宽度（不被 46px 轨道
+   压叠、量宽 scrollWidth 才是真宽度），flex 居中后超宽时左右对称溢出，
+   JS 再按比例缩放（transform 不动布局，居中不破）。
+   overflow:hidden 是兜底——万一缩放没跟上，字面最多被圆裁掉，也不会压到名称行。 */
+.dsu-roundel-letter {
+  display: block;
+  flex: 0 0 auto;
+  width: max-content;
+  transform-origin: 50% 50%;
+  white-space: nowrap;
 }
 .dsu-roundel-text { display: flex; flex-direction: column; gap: 3px; }
 .dsu-roundel-name {
@@ -433,26 +478,38 @@
   color: var(--dsu-muted);
 }
 
-/* ── 左栏信息列（照概念图）：主标题 → 副行 → 状态行 → 清单 → 进度 → 标语 ── */
+/* ── 中央主舞台（2.3 升级版）：主标题 → 副行 → 状态行 → 清单 → 进度 → 标语 ──
+   整条信息轴从"左下角"搬到"屏幕中轴"：顶栏之上、页脚之下，构图重心居中。
+   .dsu-col 只做中轴定位与压宽，子元素逐个排；进场动画仍由 .dsu-brand 等各块自理 */
 .dsu-col {
   position: absolute;
-  left: 46px;
-  bottom: 118px;
-  width: min(440px, 44vw);
+  left: 50%;
+  top: 30%;
+  transform: translateX(-50%);
+  width: min(720px, 88vw);
   z-index: 22;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   pointer-events: none;
+  /* 只做透明度过渡：主舞台的纵向位置在第一/二幕（按钮出现、身份卡展开）里绝不动，
+     任何 top 位移都会让整块版心上下滑，看起来就是"跳一下" */
+  transition: opacity 280ms ease;
 }
+/* 终幕（PROTOCOL 3 / WELCOME 版式）：主舞台整块淡出。
+   2.2 版式里主舞台在左下角，和居中的终幕天然错开；2.3 两者共用同一条中轴，
+   不收掉就会标题压标题、清单穿黑框。280ms < finale() 里揭幕前那 360ms 等待，
+   所以在 WELCOME 现身之前已经退干净（不会交叉叠字）。 */
+#dsh-startup-root.dsu-finale .dsu-col { opacity: 0; }
 .dsu-headline {
   display: flex;
   align-items: baseline;
   gap: 14px;
   font-family: var(--dsu-din);
-  font-size: clamp(34px, 3.6vw, 54px);
+  font-size: clamp(38px, 4.2vw, 60px);
   font-weight: 300;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.26em;
+  margin-right: -0.26em; /* 末位字距会把中轴撑偏右，抵回来保正居中 */
   line-height: 1;
   color: var(--dsu-ink);
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
@@ -464,22 +521,23 @@
   text-shadow: 0 0 14px rgba(77, 159, 232, 0.35);
 }
 .dsu-headline-sub {
-  margin-top: 10px;
+  margin-top: 12px;
   font-family: var(--dsu-mono);
   font-size: 11px;
-  letter-spacing: 0.26em;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em; /* 同上：字距配对，中轴正中 */
   color: var(--dsu-ink-soft);
 }
 
-/* 状态区（概念图 "INITIATING..." 的位置）*/
+/* 状态区（中轴正中，"INITIATING..." 的位置）*/
 .dsu-center {
   position: relative;
   z-index: 22;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 0;
-  margin-top: 30px;
+  margin-top: 32px;
   pointer-events: none;
   transition: opacity 340ms ease;
 }
@@ -490,11 +548,13 @@
 .dsu-status {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 14px;
+  min-height: 1.2em; /* 逐字打字清空时也占住一行高：否则整块状态区塌陷、清单跟着上下跳 */
   font-family: var(--dsu-din);
-  font-size: 30px;
+  font-size: 32px;
   font-weight: 400;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   color: var(--dsu-ink);
   opacity: 0;
   transition: opacity 300ms ease;
@@ -504,9 +564,9 @@
 .dsu-status.dsu-zhline {
   font-family: var(--dsu-zh);
   font-weight: 400;
-  letter-spacing: 0.2em;
-  text-indent: 0.2em;
-  font-size: 29px;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  font-size: 31px;
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
 }
 .dsu-caret {
@@ -524,11 +584,13 @@
 @keyframes dsu-blink { 50% { opacity: 0; } }
 
 .dsu-sub-en {
-  margin-top: 12px;
+  margin-top: 10px;
+  min-height: 1.2em; /* 同上：打字空隙不许塌陷 */
   font-family: var(--dsu-mono);
   font-size: 11.5px;
   font-weight: 400;
   letter-spacing: 0.4em;
+  text-indent: 0.4em;
   color: var(--dsu-accent);
   opacity: 0;
   white-space: nowrap;
@@ -537,13 +599,13 @@
 .dsu-sub-en.dsu-in { opacity: 0.95; }
 
 .dsu-rule {
-  margin-top: 18px;
+  margin: 18px auto 0;
   height: 1px;
   width: 0;
   background: var(--dsu-hair);
   transition: width 620ms cubic-bezier(0.2, 0.9, 0.2, 1);
 }
-.dsu-rule.dsu-in { width: min(330px, 24vw); }
+.dsu-rule.dsu-in { width: min(430px, 36vw); }
 
 /* 中央标识（鲸鱼装配）：2.2 版式里不再出现，元素保留供测试与回退 */
 .dsu-logo {
@@ -621,7 +683,7 @@
   opacity: 0.85;
 }
 
-/* 读取阶段的十六进制瀑布：2.2 版式里由左栏自检清单接管，元素保留供测试与回退 */
+/* 读取阶段的十六进制瀑布：2.2 版式里由自检清单接管，元素保留供测试与回退 */
 .dsu-hex {
   display: none;
   position: absolute;
@@ -644,10 +706,10 @@
 }
 .dsu-hex.dsu-in { opacity: 0.6; }
 
-/* ── 开机自检清单（左栏，照概念图）：> ITEM .... OK ────────────────────── */
+/* ── 开机自检清单（居中窄栏）：> ITEM .... OK ────────────────────────────── */
 .dsu-checklist {
-  margin-top: 20px;
-  width: 100%;
+  margin-top: 22px;
+  width: min(100%, 560px);
   display: flex;
   flex-direction: column;
   gap: 7px;
@@ -685,25 +747,26 @@
   text-shadow: 0 0 10px rgba(77, 159, 232, 0.4);
 }
 
-/* 标语（概念图左栏最底部一行小字） */
+/* 标语（中轴最末一行小字，居中） */
 .dsu-tagline {
-  margin-top: 16px;
+  margin-top: 18px;
   font-family: var(--dsu-mono);
   font-size: 10.5px;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.24em;
+  text-indent: 0.24em;
   color: var(--dsu-muted);
   opacity: 0;
   transition: opacity 560ms ease;
 }
 .dsu-tagline.dsu-in { opacity: 1; }
 
-/* ── 交互区（挪进左栏：按钮 / 身份卡 / 提示）───────────────────────────── */
+/* ── 交互区（居中：按钮 / 身份卡 / 提示）───────────────────────────────── */
 .dsu-action {
   position: relative;
   z-index: 26;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
   margin-top: 20px;
   opacity: 0;
@@ -765,13 +828,15 @@
   letter-spacing: 0.06em;
 }
 
-/* 身份卡（第二步）：纯中文标签 + 数字，去掉了英文双写与竖排表头，尽量干净 */
+/* 身份卡（第二步）：横排数据条 —— 标签在上、数值在下，三项并排。
+   竖排三行近 100px 高，会把按钮和提示一路顶到底部字幕上；横排压到 ~50px，
+   主舞台不用上下移动也能放得下（第一/二幕跳动就是这么来的）。 */
 .dsu-card {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: stretch;
   gap: 0;
-  min-width: 300px;
-  padding: 2px 0;
+  padding: 7px 0;
   border-top: 1px solid var(--dsu-hair);
   border-bottom: 1px solid var(--dsu-hair);
 }
@@ -780,23 +845,27 @@
 .dsu-card[hidden] { display: none; }
 .dsu-card-row {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 34px;
-  padding: 8px 2px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 0 20px;
   font-family: var(--dsu-zh);
-  font-size: 12.5px;
+  font-size: 11px;
   letter-spacing: 0.14em;
   color: var(--dsu-muted);
 }
+.dsu-card-row:first-child { padding-left: 2px; }
+.dsu-card-row:last-child { padding-right: 2px; }
 .dsu-card-row + .dsu-card-row {
-  border-top: 1px solid var(--dsu-hair-soft);
+  border-top: 0;
+  border-left: 1px solid var(--dsu-hair-soft);
 }
 .dsu-card-row b {
   font-family: var(--dsu-din);
   font-weight: 700;
   font-size: 15px;
   letter-spacing: 0.08em;
+  line-height: 1.1;
   color: var(--dsu-ink);
 }
 .dsu-card-row b.dsu-zhname { font-family: var(--dsu-zh); letter-spacing: 0.1em; }
@@ -847,6 +916,9 @@
   font-size: 10px;
   letter-spacing: 0.5em;
   text-indent: 0.5em;
+  /* 文案是 "V A N G U A R D  C L A S S"（双空格分词），默认会折叠成一个空格，
+     字距又均等 —— 两个词会粘成 VANGUARDCLASS；保留空白后词间才有明显断点 */
+  white-space: pre;
   color: var(--dsu-ink-soft);
 }
 .dsu-w4 {
@@ -1004,7 +1076,7 @@
 }
 
 /* ── 页脚 / 字幕 / 进度条 ───────────────────────────────────────────────── */
-/* 页脚（照概念图挪到左下角）：第一行 "HARNESS v2.2.0"（自动），第二行版权行 */
+/* 页脚（左下角）：第一行 "HARNESS v2.3.0"（自动），第二行版权行 */
 .dsu-foot {
   position: absolute;
   left: 46px;
@@ -1041,6 +1113,7 @@
   align-items: center;
   gap: 6px;
   pointer-events: none;
+  transition: opacity 320ms ease;
 }
 .dsu-sub-zh {
   font-family: var(--dsu-zh);
@@ -1065,7 +1138,7 @@
 }
 .dsu-sub-en2.dsu-in { opacity: 0.85; transform: none; }
 
-/* 底部进度：挪进左栏（照概念图横在清单下面），右侧跟百分比读数 */
+/* 底部进度：中轴上横在清单下面，右侧跟百分比读数 */
 .dsu-progress {
   position: relative;
   margin-top: 22px;
@@ -1100,7 +1173,7 @@
   white-space: nowrap;
 }
 
-/* 阶段计数（右下，页脚挪去左下后补位） */
+/* 阶段计数（右下） */
 .dsu-stepcount {
   position: absolute;
   right: 46px;
@@ -1139,7 +1212,7 @@
 .dsu-skip[hidden] { display: none; }
 
 /* ── 机框装饰层（照原片的疏密：只贴边，不占中间）──────────────────────── */
-/* 四角定位标记 / 一次性扫描线 / 品牌块下单行小字（含时钟）/ 六个阶段格 */
+/* 四角定位标记 / 一次性扫描线；顶栏中轴小字（含时钟）与阶段格另立两节 */
 .dsu-frame {
   position: absolute;
   inset: 0;
@@ -1210,11 +1283,13 @@
   100% { top: 102%; opacity: 0; }
 }
 
-/* 品牌块下方的一行小字：产品行 + 实时时钟（时钟点亮主题色） */
+/* 品牌块对面、顶栏下方的一条横带：产品行 + 实时时钟（时钟点亮主题色）
+   2.3 居中版式：从品牌块左下方挪到"中轴 + 品牌块下方"——横向居中不与品牌块打架，
+   纵向压在品牌块（≈140px 高）之下、主舞台上沿之上，窄窗口也不相撞 */
 .dsu-meta {
   position: absolute;
-  left: 46px;
-  top: 162px;
+  left: 50%;
+  top: 160px;
   z-index: 20;
   display: flex;
   align-items: baseline;
@@ -1224,28 +1299,29 @@
   letter-spacing: 0.16em;
   color: var(--dsu-muted);
   opacity: 0;
-  transform: translateX(-18px);
+  transform: translate(-50%, -18px);
   transition: opacity 560ms ease, transform 560ms cubic-bezier(0.16, 0.84, 0.24, 1);
   transition-delay: 330ms;
 }
-.dsu-meta.dsu-in { opacity: 1; transform: none; }
+.dsu-meta.dsu-in { opacity: 1; transform: translate(-50%, 0); }
 .dsu-meta-2 { color: var(--dsu-accent); }
 
-/* 六个阶段格：横排在左栏小字下面，走过的压暗、当前的点亮并拉长 */
+/* 六个阶段格：居中产品行正下方，走过的压暗、当前的点亮并拉长 */
 .dsu-slats {
   position: absolute;
-  left: 46px;
-  top: 188px;
+  left: 50%;
+  top: 186px;
   z-index: 20;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
   opacity: 0;
-  transform: translateX(-18px);
+  transform: translate(-50%, -10px);
   transition: opacity 560ms ease, transform 560ms cubic-bezier(0.16, 0.84, 0.24, 1);
   transition-delay: 420ms;
 }
-.dsu-slats.dsu-in { opacity: 1; transform: none; }
+.dsu-slats.dsu-in { opacity: 1; transform: translate(-50%, 0); }
 .dsu-slat {
   width: 20px;
   height: 2px;
@@ -1291,15 +1367,18 @@
   50% { height: 100%; }
 }
 
-/* 窄窗口：左栏收窄，右上角机构行让位（身份读数保留，不做窄窗隐藏） */
+/* 窄窗口：主舞台收窄，右上角机构行让位（身份读数保留，不做窄窗隐藏）；
+   百分比读数贴到进度条右端上方，不再外挂（外挂在窄窗会被裁掉） */
 @media (max-width: 900px) {
-  .dsu-col { width: min(440px, calc(100vw - 92px)); }
+  .dsu-col { width: min(560px, calc(100vw - 56px)); }
   .dsu-tr { display: none; }
+  .dsu-pct { left: auto; right: 0; top: -20px; transform: none; }
 }
 
-/* 矮窗口（1366×768 一类）：收紧行距、藏掉次要装饰，保证左栏不撞品牌块 */
+/* 矮窗口（1366×768 一类）：主舞台上移一档、收紧行距、藏掉次要装饰，
+   保证中轴内容与顶栏 / 页脚互不相撞 */
 @media (max-height: 860px) {
-  .dsu-col { bottom: 96px; }
+  .dsu-col { top: 30%; }
   .dsu-center { margin-top: 20px; }
   .dsu-headline { font-size: clamp(30px, 4.8vh, 44px); }
   .dsu-checklist { margin-top: 14px; gap: 5px; }
@@ -1307,11 +1386,31 @@
 }
 @media (max-height: 640px) {
   .dsu-tagline { display: none; }
+  .dsu-col { top: 24%; }
 }
+
+/* ── 交互幕（需要点按钮确认的第 1 / 2 步）─────────────────────────────────
+   主舞台的位置**一动不动**（第一/二幕任何 top 位移都会读成"上下跳"）：
+   身份卡改成横排数据条后只占 ~50px，按钮和提示就落在版心下方原本空着的区域。
+   唯一让位动作是底部字幕淡出——操作提示自己占那一行，不和字幕抢同一行字。 */
+#dsh-startup-root.dsu-await .dsu-subtitle { opacity: 0; }
 
 /* 无障碍：尊重系统"减少动态效果" */
 @media (prefers-reduced-motion: reduce) {
   #dsh-startup-root .dsu-ret-rot-a,
   #dsh-startup-root .dsu-ret-rot-b { animation: none; }
   #dsh-startup-root .dsu-scanline.dsu-go { animation: none; }
+}
+/* 读屏通报区：视觉完全隐藏，只有屏幕阅读器会念 */
+#dsh-startup-root .dsu-sr-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+  padding: 0;
 }

@@ -359,7 +359,7 @@ console.log('\n[8] 语音素材通道：BT 真声优先、缺素材自动回落 
   check('揭幕前留一拍收尾（不在最后一个音节上直接进主界面）',
     /\.then\(function \(\) \{ return welcome \}\)\s*\.then\(function \(\) \{ return wait\(ms\(280\)\) \}\)/.test(src))
   check('运行时版本横幅（控制台一眼看出跑的是哪份代码）',
-    /RUNTIME_VERSION = '2\.2\.0'/.test(src) && src.includes("[dsh-startup-screen] 运行时 v' + RUNTIME_VERSION"))
+    /RUNTIME_VERSION = '2\.3\.0'/.test(src) && src.includes("[dsh-startup-screen] 运行时 v' + RUNTIME_VERSION"))
   check('素材加载结果暴露 __DSH_STARTUP_ASSETS__（401/404/解码失败可查）',
     src.includes('__DSH_STARTUP_ASSETS__') && src.includes("素材 ' + name + ' 不可用"))
   check('素材拿不到时按 .mp3 → .wav → .ogg 依次尝试', /\.mp3'\)\.then/.test(src) && /\.wav'\)\.then/.test(src) && /\.ogg'\)\.then/.test(src))
@@ -386,6 +386,74 @@ console.log('\n[8b] 2.2 Hammond 版式：自检清单 / 百分比 / 背景图 / 
   check('背景图结果写进 __DSH_STARTUP_ASSETS__.bg', /__DSH_STARTUP_ASSETS__\.bg = state/.test(src))
   check('底板点亮后状态行先待命（INITIATING...）',
     src.includes("typeIn(ui.statusZh, '初始化', 46)") && src.includes("typeIn(ui.subEn, 'INITIATING...', 13)"))
+}
+
+console.log('\n[8c] 圆徽字母防重合：字面长出圆环自动缩放居中（2.3 回归锁）')
+{
+  const src = fs.readFileSync(BUNDLE, 'utf8')
+  const css = fs.readFileSync(fileURLToPath(new URL('../lib/splash.css', import.meta.url)), 'utf8')
+  check('字母装进独立节点 .dsu-roundel-letter（供量宽与缩放）', src.includes("el('i', 'dsu-roundel-letter'"))
+  check('先按字数估一版比例（配置里是整词也不闪出溢出帧）', /len > 1\) apply\(/.test(src))
+  check('rAF 布局稳定后按实宽精调', /requestAnimationFrame\(precise\)/.test(src) && /letter\.scrollWidth/.test(src))
+  check('字体替换后 400ms 再校正一次（含变窄回松）', /setTimeout\(precise, 400\)/.test(src) && /变窄了也要松回来/.test(src))
+  check('缩放下限限制在可读档（0.3 估 / 0.22 量）', /floor \|\| 0\.3/.test(src) && /0\.22/.test(src))
+  check('.dsu-roundel overflow:hidden 兜底（缩放失灵也只裁在圆内，不压名称行）', /\.dsu-roundel\s*\{[^}]*overflow:\s*hidden/.test(css))
+  check('.dsu-roundel 用 flex 居中（超宽时左右对称溢出，字面才对得上中轴）', /\.dsu-roundel\s*\{[^}]*display:\s*flex[^}]*justify-content:\s*center/.test(css))
+  check('.dsu-roundel-letter 以 width:max-content + nowrap 量到真实宽度', /\.dsu-roundel-letter\s*\{[^}]*width:\s*max-content/.test(css) && /\.dsu-roundel-letter\s*\{[^}]*white-space:\s*nowrap/.test(css))
+  check('DOM 桩（无 firstChild / 无 scrollWidth）安全退出', /if \(!letter \|\| !letter\.style\) return/.test(src))
+  /* 跑一遍真实配置复现体干掉 */
+  r = run(true, { brand3a: 'HARNESS', brand3b: 'OS' })
+  check('长词圆徽照样初始化不抛、正常摘黑幕',
+    r.thrown === null && !r.root.classList.contains('dsu-boot'))
+}
+
+console.log('\n[8d] 全局归零不许用 ID 特异性压死类里的 margin / padding（2.3 回归锁）')
+{
+  const css = fs.readFileSync(fileURLToPath(new URL('../lib/splash.css', import.meta.url)), 'utf8')
+  /* 把所有"带 margin: 0"的规则抠出来，凡是命中 #dsh-startup-root 的，
+     选择器必须落在 :where() 里（零特异性）或就是根节点本身 */
+  const resetRules = [...css.matchAll(/([^{}]+)\{([^{}]*margin:\s*0[^{}]*)\}/g)]
+    .map((m) => ({ sel: m[1].trim().replace(/\s+/g, ' '), body: m[2] }))
+    .filter((r) => r.sel.includes('#dsh-startup-root'))
+  check('存在归零规则', resetRules.length > 0, String(resetRules.length))
+  check('归零规则全在 :where() / 根节点上（类里的 margin 才生效）',
+    resetRules.every((r) => r.sel.includes(':where(') || /^#dsh-startup-root$/.test(r.sel)),
+    resetRules.map((r) => r.sel).join(' | '))
+  check('box-sizing 归零仍用 ID 特异性（结构性属性不交给类去改）',
+    /#dsh-startup-root \*[^{}]*\{[^{}]*box-sizing:\s*border-box/.test(css))
+  check('类里的间距定义仍在（标语 18px / 清单 22px）',
+    /\.dsu-tagline\s*\{[^}]*margin-top:\s*18px/.test(css) && /\.dsu-checklist\s*\{[^}]*margin-top:\s*22px/.test(css))
+}
+
+console.log('\n[8e] 终幕整块收起主舞台（2.3 居中版式不与 WELCOME 叠字）')
+{
+  const src = fs.readFileSync(BUNDLE, 'utf8')
+  const css = fs.readFileSync(fileURLToPath(new URL('../lib/splash.css', import.meta.url)), 'utf8')
+  check('finale() 里给根节点打 dsu-finale', /root\.classList\.add\('dsu-finale'\)/.test(src))
+  check('细部：先退场（dsu-finale）再等 360ms 才上 WELCOME', /root\.classList\.add\('dsu-finale'\)[\s\S]{0,240}?return wait\(360\)/.test(src))
+  check('CSS 收掉整块 .dsu-col（标题 / 清单 / 进度 / 标语一起淡出）',
+    /#dsh-startup-root\.dsu-finale \.dsu-col\s*\{\s*opacity:\s*0/.test(css))
+  check('.dsu-col 有透明度过渡（退场是淡出不是闪没）', /\.dsu-col\s*\{[^}]*transition:\s*opacity/.test(css))
+  check('重播会重建根节点（dsu-finale 不会残留到下一次）', /removeChild\(old\)/.test(src))
+}
+
+console.log('\n[8f] 第一/二幕不上下跳：交互幕只让字幕让位，版心位置不动（2.3 回归锁）')
+{
+  const src = fs.readFileSync(BUNDLE, 'utf8')
+  const css = fs.readFileSync(fileURLToPath(new URL('../lib/splash.css', import.meta.url)), 'utf8')
+  check('showAction() 给根节点打 dsu-await', /function showAction[\s\S]{0,900}?root\.classList\.add\('dsu-await'\)/.test(src))
+  check('hideAction() 撤掉 dsu-await', /function hideAction\s*\(\)\s*\{[\s\S]{0,120}?root\.classList\.remove\('dsu-await'\)/.test(src))
+  check('dsu-await 时底部字幕淡出（操作提示自己占那一行）',
+    /#dsh-startup-root\.dsu-await \.dsu-subtitle\s*\{\s*opacity:\s*0/.test(css))
+  check('dsu-await 不许改主舞台位置（否则第一/二幕整块上下滑）',
+    !/#dsh-startup-root\.dsu-await \.dsu-col\s*\{[^}]*top:/.test(css) &&
+    !/dsu-await[^{]*\{\s*top:/.test(css))
+  check('.dsu-col 的过渡只有 opacity（没有 top 位移过渡）',
+    /\.dsu-col\s*\{[^}]*transition:\s*opacity[^;]*;/.test(css) && !/\.dsu-col\s*\{[^}]*transition:[^;]*top/.test(css))
+  check('身份卡横排（标签上 / 数值下，三项并排）',
+    /\.dsu-card\s*\{[^}]*flex-direction:\s*row/.test(css) &&
+    /\.dsu-card-row\s*\{[^}]*flex-direction:\s*column/.test(css))
+  check('字幕有透明度过渡（让位是淡出不是闪没）', /\.dsu-subtitle\s*\{[^}]*transition:\s*opacity/.test(css))
 }
 
 console.log('\n[9] 右下角身份读数：不压版心、窄窗口不丢、第 3 幕随身份核验退场')
